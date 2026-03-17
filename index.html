@@ -79,23 +79,30 @@
                 </div>
 
                 <div class="flex-1 overflow-y-auto px-4 pb-24 space-y-6 pt-2">
-                    
-                    <div class="bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0">
+
+                <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
+    
+                    <div v-for="w in weatherList" :key="w.city" 
+                        class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
+        
                         <div class="absolute -right-1 -top-4 text-ice-50 opacity-60 text-6xl rotate-12 pointer-events-none">
-                            <i :class="weatherInfo.icon"></i>
+                            <i :class="w.icon"></i>
                         </div>
+        
                         <div class="z-10 flex items-center gap-3">
-                            <i :class="weatherInfo.icon" class="text-2xl text-ice-500"></i>
+                            <i :class="w.icon" class="text-2xl text-ice-500"></i>
                             <div class="flex items-baseline gap-2">
-                                <h2 class="text-2xl font-black text-slate-800">{{ weatherInfo.temp }}°</h2>
-                                <p class="text-[10px] text-slate-400 font-bold">體感 {{ weatherInfo.feel }}°</p>
+                                <h2 class="text-2xl font-black text-slate-800">{{ w.temp }}°</h2>
+                                <p class="text-[10px] text-slate-400 font-bold">體感 {{ w.feel }}°</p>
                             </div>
                         </div>
+        
                         <div class="z-10 flex flex-col items-end">
                             <span class="bg-ice-100 text-ice-600 text-[9px] font-bold px-2 py-0.5 rounded-full mb-0.5">TODAY</span>
-                            <span class="text-[10px] text-slate-400">大阪</span>
+                            <span class="text-[10px] text-slate-400">{{ w.city }}</span>
                         </div>
-                    </div>
+                   </div>
+               </div>
 
                     <div class="relative pl-2">
                         <div class="absolute left-[29px] top-4 bottom-0 w-0.5 dashed-line z-0"></div>
