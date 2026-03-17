@@ -4,7 +4,7 @@ createApp({
     setup() {
         const currentTab = ref('itinerary');
         const selectedDate = ref('2026-04-02');
-        const calcJpy = ref(null);
+        const calcKrw= ref(null);
         const exchangeRate = ref(0.024); 
 
         // --- Data storage Key ---
@@ -419,7 +419,7 @@ createApp({
         return { 
             currentTab, dates, selectedDate, formatDate, itineraryData, currentItinerary, 
             shoppingList, expenses, expensesStats, dbsStats,
-            calcJpy, exchangeRate, weatherList, getCategoryIcon, getTransportIcon, openMap, 
+            calcKrw, exchangeRate, weatherList, getCategoryIcon, getTransportIcon, openMap, 
             showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal, dragStart, drop, 
             showShopModal, shopForm, openShopModal, handleImageUpload, saveShopItem, removeShoppingItem, 
             showExpenseModal, expenseForm, openExpenseModal, saveExpense, deleteExpense,
