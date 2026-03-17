@@ -419,7 +419,7 @@ createApp({
         return { 
             currentTab, dates, selectedDate, formatDate, itineraryData, currentItinerary, 
             shoppingList, expenses, expensesStats, dbsStats,
-            calcJpy, exchangeRate, weatherInfo, getCategoryIcon, getTransportIcon, openMap, 
+            calcJpy, exchangeRate, weatherlist, getCategoryIcon, getTransportIcon, openMap, 
             showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal, dragStart, drop, 
             showShopModal, shopForm, openShopModal, handleImageUpload, saveShopItem, removeShoppingItem, 
             showExpenseModal, expenseForm, openExpenseModal, saveExpense, deleteExpense,
