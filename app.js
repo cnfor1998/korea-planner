@@ -5,7 +5,7 @@ createApp({
         const currentTab = ref('itinerary');
         const selectedDate = ref('2026-04-02');
         const calcJpy = ref(null);
-        const exchangeRate = ref(0.206); 
+        const exchangeRate = ref(0.024); 
 
         // --- Data storage Key ---
         const STORAGE_KEYS = {
@@ -58,7 +58,7 @@ createApp({
 
         const getExchangeRate = async () => {
             try {
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/KRW');
                 const data = await response.json();
                 if (data?.rates?.TWD) exchangeRate.value = data.rates.TWD;
             } catch (error) { console.error("匯率失敗", error); }
