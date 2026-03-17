@@ -25,7 +25,7 @@ createApp({
         const getWeather = async () => {
         for (let weather of weatherList.value) {
             try {
-                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${weather.lat}&longitude=${weather.lon}&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FSeoul`);
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${weather.lat} & longitude=${weather.lon}&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FSeoul`);
                 const data = await response.json();
             
                 weather.temp = Math.round(data.current.temperature_2m);
@@ -137,50 +137,11 @@ createApp({
         };
 
         const defaultItinerary = {
-            '2026-02-20': [
-                { 
-                    id: 1, 
-                    name: '抵達關西機場', 
-                    time: '10:40', 
-                    category: '航班', 
-                    flight: { from: 'KHH', to: 'KIX', dep: '06:55', arr: '10:40', no: 'IT284' },
-                    transportMode: 'train', 
-                    transportTime: '45分' 
-                },
-                { id: 2, name: 'Check-in (Eslead Hotel)', time: '13:00', category: '住宿', transportMode: 'walk', transportTime: '10分' },
-                { id: 3, name: '新世界/通天閣', time: '14:00', category: '美食', transportMode: 'train', transportTime: '15分' },
-                { id: 4, name: '心齋橋/難波 購物', time: '16:00', category: '購物', transportMode: 'walk', transportTime: '10分' },
-                { id: 5, name: '燒肉力丸', time: '19:00', category: '美食', transportMode: 'walk', transportTime: '20分' },
-                { id: 6, name: '阿倍野 HARUKAS 300', time: '20:30', category: '景點', note: '看夜景' }
-            ],
-            '2026-02-21': [
-                { id: 1, name: '日本橋2號出口集合', time: '08:30', category: '其他', note: 'KKDay 一日團', transportMode: 'car', transportTime: '1小時' },
-                { id: 2, name: '勝尾寺', time: '10:00', category: '景點', transportMode: 'car', transportTime: '50分' },
-                { id: 3, name: '嵐山 (渡月橋/竹林)', time: '13:00', category: '景點', transportMode: 'car', transportTime: '40分' },
-                { id: 4, name: '伏見稻荷大社', time: '15:30', category: '景點', transportMode: 'car', transportTime: '1小時' },
-                { id: 5, name: '心齋橋覓食', time: '18:00', category: '美食' }
-            ],
-            '2026-02-22': [
-                 { id: 1, name: '近鐵日本橋站集合', time: '08:00', category: '其他', note: 'KKDay 天橋立團', transportMode: 'car', transportTime: '2小時' },
-                 { id: 2, name: '伊根灣遊船', time: '10:30', category: '景點', transportMode: 'car', transportTime: '30分' },
-                 { id: 3, name: '天橋立 (傘松公園)', time: '13:00', category: '景點', transportMode: 'car', transportTime: '1小時' },
-                 { id: 4, name: '美山茅屋之里', time: '15:30', category: '景點', transportMode: 'car', transportTime: '2小時' },
-                 { id: 5, name: '蟹道樂東店/壽喜燒', time: '19:00', category: '美食', transportMode: 'walk', transportTime: '15分' },
-                 { id: 6, name: '玉出超市 惠美須店', time: '21:00', category: '購物' }
-            ],
-            '2026-02-23': [
-                { id: 1, name: '環球影城 USJ', time: '08:00', category: '景點', note: '整天! 記得買快速通關', transportMode: 'train', transportTime: '30分' }
-            ],
-            '2026-02-24': [
-                { id: 1, name: 'Check-out', time: '08:00', category: '住宿', transportMode: 'train', transportTime: '50分' },
-                { 
-                    id: 2, 
-                    name: '關西機場 (KIX)', 
-                    time: '09:30', 
-                    category: '航班', 
-                    flight: { from: 'KIX', to: 'KHH', dep: '11:30', arr: '14:00', no: 'IT285', terminal: 'Terminal 1' }
-                }
-            ]
+            '2026-04-02': [],
+            '2026-04-03': [],
+            '2026-04-04': [],
+            '2026-04-05': [],
+            '2026-04-06': []
         };
 
         const itineraryData = reactive({ ...defaultItinerary });
@@ -225,7 +186,7 @@ createApp({
         const shopForm = reactive({ index: -1, name: '', image: null }); 
 
         const showExpenseModal = ref(false);
-        const expenseForm = reactive({ id: null, date: '2026-02-20', name: '', amount: '', category: '飲食', payment: '現金', currency: 'JPY' });
+        const expenseForm = reactive({ id: null, date: '2026-02-20', name: '', amount: '', category: '飲食', payment: '現金', currency: 'KRW' });
 
         watch(() => expenseForm.currency, (newVal) => {
             if (newVal === 'TWD' && expenseForm.payment === '星展信用卡') {
