@@ -51,30 +51,34 @@
             
             <div v-if="currentTab === 'itinerary'" class="h-full flex flex-col animate-fade-in relative">
                 <div class="bg-slate-50 z-20">
-                    <div class="flex overflow-x-auto hide-scrollbar px-4 space-x-3 py-3 items-end">
-                        <button @click="addPrevDate" class="flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-all flex-shrink-0 active:scale-95">
-                            <i class="fa-solid fa-angle-left text-lg mb-1"></i>
-                            <span class="text-[10px] font-bold">前一天</span>
+                    <div class="flex items-center px-4 py-3 gap-2">
+            
+                        <button @click="addPrevDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
+                            <i class="fa-solid fa-angle-left text-lg"></i>
+                            <span class="text-[8px] font-bold">前一天</span>
                         </button>
 
-                        <div v-for="date in dates" :key="date.full" 
-                             @click="selectedDate = date.full" 
-                             :class="['relative flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl transition-all cursor-pointer border-2 flex-shrink-0', selectedDate === date.full ? 'bg-ice-600 text-white border-ice-600 shadow-lg scale-105 z-10' : 'bg-white text-slate-400 border-transparent shadow-sm']">
-                            
-                            <button v-if="selectedDate === date.full && dates.length > 1" 
-                                    @click.stop="deleteDate(date.full)"
-                                    class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-red-600 hover:scale-110 transition-all z-20">
-                                <i class="fa-solid fa-xmark text-[10px]"></i>
-                            </button>
-
-                            <span class="text-xs font-medium">{{ date.day }}</span>
-                            <span class="text-lg font-bold">{{ date.date }}</span>
-                        </div>
-                        
-                        <button @click="addNextDate" class="flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-all flex-shrink-0 active:scale-95">
-                            <i class="fa-solid fa-angle-right text-lg mb-1"></i>
-                            <span class="text-[10px] font-bold">後一天</span>
+                        <div class="flex-1 flex overflow-x-auto hide-scrollbar space-x-3 items-center py-2">
+                            <div v-for="date in dates" :key="date.full" 
+                                 @click="selectedDate = date.full" 
+                                 :class="['relative flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl transition-all cursor-pointer border-2 flex-shrink-0', selectedDate === date.full ? 'bg-ice-600 text-white border-ice-600 shadow-lg scale-105 z-10' : 'bg-white text-slate-400 border-transparent shadow-sm']">
+                    
+                        <button v-if="selectedDate === date.full && dates.length > 1" 
+                                @click.stop="deleteDate(date.full)"
+                                class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-20">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
                         </button>
+
+                        <span class="text-xs font-medium">{{ date.day }}</span>
+                        <span class="text-lg font-bold">{{ date.date }}</span>
+                </div>
+            </div>
+
+            <button @click="addNextDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
+                <i class="fa-solid fa-angle-right text-lg"></i>
+                <span class="text-[8px] font-bold">後一天</span>
+            </button>
+                 
                     </div>
                 </div>
 
