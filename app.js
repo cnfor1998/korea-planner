@@ -3,7 +3,7 @@ const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
 createApp({
     setup() {
         const currentTab = ref('itinerary');
-        const selectedDate = ref('2026-02-20');
+        const selectedDate = ref('2026-04-20');
         const calcJpy = ref(null);
         const exchangeRate = ref(0.206); 
 
