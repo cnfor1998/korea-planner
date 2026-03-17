@@ -3,15 +3,15 @@ const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
 createApp({
     setup() {
         const currentTab = ref('itinerary');
-        const selectedDate = ref('2026-04-20');
+        const selectedDate = ref('2026-04-02');
         const calcJpy = ref(null);
         const exchangeRate = ref(0.206); 
 
         // --- Data storage Key ---
         const STORAGE_KEYS = {
-            ITINERARY: 'osaka_trip_itinerary_v2',
-            SHOPPING: 'osaka_trip_shopping_v1',
-            EXPENSES: 'osaka_trip_expenses_v1'
+            ITINERARY: 'korea_trip_itinerary_v2',
+            SHOPPING: 'korea_trip_shopping_v1',
+            EXPENSES: 'korea_trip_expenses_v1'
         };
 
         const weatherInfo = reactive({
@@ -43,11 +43,11 @@ createApp({
         };
 
         const dates = reactive([
-            { full: '2026-02-20', day: '週五', date: '20' },
-            { full: '2026-02-21', day: '週六', date: '21' },
-            { full: '2026-02-22', day: '週日', date: '22' },
-            { full: '2026-02-23', day: '週一', date: '23' },
-            { full: '2026-02-24', day: '週二', date: '24' }
+            { full: '2026-04-02', day: '週四', date: '20' },
+            { full: '2026-04-03', day: '週五', date: '21' },
+            { full: '2026-04-04', day: '週六', date: '22' },
+            { full: '2026-04-05', day: '週日', date: '23' },
+            { full: '2026-04-06', day: '週一', date: '24' },
         ]);
 
         //  Helper: Format date object
