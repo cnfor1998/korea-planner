@@ -1,0 +1,10 @@
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+body { background-color: #f8fafc; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.dashed-line {
+    background-image: linear-gradient(to bottom, #bae6fd 50%, transparent 50%);
+    background-size: 2px 12px;
+    background-repeat: repeat-y;
+}
