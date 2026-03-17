@@ -136,6 +136,31 @@ createApp({
             selectedDate.value = dates[newIdx].full;
         };
 
+        const hotelList = reactive(JSON.parse(localStorage.getItem('my_hotels')) || [
+            { id: 1, name: '首爾飯店範本', address: '首爾特別市鐘路區...', phone: '+8221234567' }
+        ]);
+        const showHotelModal = ref(false); // 控制視窗顯示
+        const hotelForm = reactive({ name: '', address: '', phone: '' }); // 綁定輸入框
+        const saveHotel = () => {
+            if (!hotelForm.name || !hotelForm.address) return alert('請填寫飯店名稱與地址');
+            hotelList.push({
+                id: Date.now(),
+                ...hotelForm
+            });
+        localStorage.setItem('my_hotels', JSON.stringify(hotelList));
+        Object.assign(hotelForm, { name: '', address: '', phone: '' });
+        showHotelModal.value = false;
+        };
+        const deleteHotel = (id) => {
+        const index = hotelList.findIndex(h => h.id === id);
+        if (index !== -1 && confirm('確定要刪除這間飯店嗎？')) {
+            hotelList.splice(index, 1);
+            localStorage.setItem('my_hotels', JSON.stringify(hotelList));
+        }
+        };
+
+
+        
         const defaultItinerary = {
             '2026-04-02': [],
             '2026-04-03': [],
@@ -378,7 +403,8 @@ createApp({
         };
 
         return { 
-            currentTab, dates, selectedDate, formatDate, itineraryData, currentItinerary, 
+            currentTab, dates, selectedDate, formatDate,hotelList, showHotelModal, hotelForm, saveHotel, deleteHotel,
+            itineraryData, currentItinerary, 
             shoppingList, expenses, expensesStats, dbsStats,
             calcKrw, exchangeRate, weatherList, getCategoryIcon, getTransportIcon, openMap, 
             showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal, dragStart, drop, 
