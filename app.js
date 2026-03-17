@@ -65,11 +65,11 @@ createApp({
         };
 
         const dates = reactive([
-            { full: '2026-04-02', day: '週四', date: '20' },
-            { full: '2026-04-03', day: '週五', date: '21' },
-            { full: '2026-04-04', day: '週六', date: '22' },
-            { full: '2026-04-05', day: '週日', date: '23' },
-            { full: '2026-04-06', day: '週一', date: '24' },
+            { full: '2026-04-02', day: '週四', date: '02' },
+            { full: '2026-04-03', day: '週五', date: '03' },
+            { full: '2026-04-04', day: '週六', date: '04' },
+            { full: '2026-04-05', day: '週日', date: '05' },
+            { full: '2026-04-06', day: '週一', date: '06' },
         ]);
 
         //  Helper: Format date object
