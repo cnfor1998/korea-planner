@@ -1,2 +1,2 @@
-# Osaka_planner
-大阪5天4夜行程
+# korea_planner
+韓國6天5夜行程
