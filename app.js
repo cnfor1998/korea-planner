@@ -14,25 +14,47 @@ createApp({
             EXPENSES: 'korea_trip_expenses_v1'
         };
 
-        const weatherInfo = reactive({
-            temp: '-', feel: '-', icon: 'fa-solid fa-spinner fa-spin text-ice-300', text: '載入中'
-        });
-
+        //const weatherInfo = reactive({
+        //    temp: '-', feel: '-', icon: 'fa-solid fa-spinner fa-spin text-ice-300', text: '載入中'
+        //});
+        const weatherList = ref([
+            { city: '首爾', lat: 37.5665, lon: 126.9780, temp: '-', feel: '-', icon: 'fa-solid fa-spinner fa-spin' },
+            { city: '釜山', lat: 35.1796, lon: 129.0756, temp: '-', feel: '-', icon: 'fa-solid fa-spinner fa-spin' }
+        ])
         // --- API Function ---
         const getWeather = async () => {
+        for (let weather of weatherList.value) {
             try {
-                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FTokyo`);
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${weather.lat}&longitude=${weather.lon}&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FSeoul`);
                 const data = await response.json();
-                weatherInfo.temp = Math.round(data.current.temperature_2m);
-                weatherInfo.feel = Math.round(data.current.apparent_temperature);
+            
+                weather.temp = Math.round(data.current.temperature_2m);
+                weather.feel = Math.round(data.current.apparent_temperature);
+            
                 const code = data.current.weather_code;
-                if (code === 0) weatherInfo.icon = 'fa-solid fa-sun text-yellow-400';
-                else if (code <= 3) weatherInfo.icon = 'fa-solid fa-cloud-sun text-slate-400';
-                else if (code <= 67) weatherInfo.icon = 'fa-solid fa-cloud-rain text-ice-500';
-                else if (code <= 77) weatherInfo.icon = 'fa-regular fa-snowflake text-ice-300';
-                else weatherInfo.icon = 'fa-solid fa-cloud text-slate-400';
-            } catch (error) { console.error("天氣失敗", error); }
+                if (code === 0) weather.icon = 'fa-solid fa-sun text-yellow-400';
+                else if (code <= 3) weather.icon = 'fa-solid fa-cloud-sun text-slate-400';
+                else if (code <= 67) weather.icon = 'fa-solid fa-cloud-rain text-ice-500';
+                else if (code <= 77) weather.icon = 'fa-regular fa-snowflake text-ice-300';
+                else weather.icon = 'fa-solid fa-cloud text-slate-400';
+            } catch (error) { 
+                console.error(`${weather.city}天氣失敗`, error); }
+            }
         };
+        //const getWeather = async () => {
+        //    try {
+        //        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FTokyo`);
+        //        const data = await response.json();
+        //        weatherInfo.temp = Math.round(data.current.temperature_2m);
+        //        weatherInfo.feel = Math.round(data.current.apparent_temperature);
+        //        const code = data.current.weather_code;
+        //        if (code === 0) weatherInfo.icon = 'fa-solid fa-sun text-yellow-400';
+        //        else if (code <= 3) weatherInfo.icon = 'fa-solid fa-cloud-sun text-slate-400';
+        //       else if (code <= 67) weatherInfo.icon = 'fa-solid fa-cloud-rain text-ice-500';
+        //        else if (code <= 77) weatherInfo.icon = 'fa-regular fa-snowflake text-ice-300';
+        //        else weatherInfo.icon = 'fa-solid fa-cloud text-slate-400';
+        //    } catch (error) { console.error("天氣失敗", error); }
+        //};
 
         const getExchangeRate = async () => {
             try {
