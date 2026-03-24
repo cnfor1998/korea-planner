@@ -111,7 +111,9 @@ createApp({
             selectedDate.value = dates[newIdx].full;
         };
 
-        const hotelList = reactive(JSON.parse(localStorage.getItem('my_hotels')) || []);
+        const hotelList = reactive(JSON.parse(localStorage.getItem('my_hotels')) || [  
+            { id: 1, name: '首爾飯店範本', address: '首爾特別市鐘路區...', phone: '+8221234567' }
+        ]);
 
         const showHotelModal = ref(false);
         const hotelForm = reactive({ name: '', address: '', phone: '' });
