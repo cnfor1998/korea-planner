@@ -1,4 +1,4 @@
-const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
+    const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
 createApp({
     setup() {
         const currentTab = ref('itinerary');
@@ -69,8 +69,17 @@ createApp({
 
         // Function: Add one day
         const addNextDate = () => {
-            const lastDateObj = dates[dates.length - 1];
-            const nextDate = new Date(lastDateObj.full);
+            const lastDate = dates[dates.length - 1];
+            const currentIdx = dates.findIndex(d => d.full === selectedDate.value);
+    
+            // 如果目前選的不是最後一天，直接跳到下一天
+            if (currentIdx < dates.length - 1) {
+                selectedDate.value = dates[currentIdx + 1].full;
+                return;
+            }
+    
+            // 已經是最後一天，才新增
+            const nextDate = new Date(lastDate.full);
             nextDate.setDate(nextDate.getDate() + 1);
             const newDate = getFormattedDate(nextDate);
             dates.push(newDate);
@@ -79,13 +88,22 @@ createApp({
             setTimeout(() => {
                 const container = document.querySelector('.overflow-x-auto');
                 if (container) container.scrollLeft = container.scrollWidth;
-            }, 100);
+                }, 100);
         };
 
         // Function: Add one day forward
         const addPrevDate = () => {
-            const firstDateObj = dates[0];
-            const prevDate = new Date(firstDateObj.full);
+            const firstDate = dates[0];
+            const currentIdx = dates.findIndex(d => d.full === selectedDate.value);
+    
+            // 如果目前選的不是第一天，直接跳到上一天
+            if (currentIdx > 0) {
+                selectedDate.value = dates[currentIdx - 1].full;
+                return;
+            }
+    
+            // 已經是第一天，才新增
+            const prevDate = new Date(firstDate.full);
             prevDate.setDate(prevDate.getDate() - 1);
             const newDate = getFormattedDate(prevDate);
             dates.unshift(newDate);
@@ -94,7 +112,7 @@ createApp({
             setTimeout(() => {
                 const container = document.querySelector('.overflow-x-auto');
                 if (container) container.scrollLeft = 0;
-            }, 100);
+        }, 100);
         };
 
         const deleteDate = (targetFull) => {
