@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>韓國之旅 </title>
-    
+    <title>韓國之旅</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
-
     <script>
         tailwind.config = {
             theme: {
@@ -31,12 +28,16 @@
     </script>
 </head>
 <body class="bg-slate-50 text-slate-700 h-screen overflow-hidden font-sans">
-
     <div id="app" class="h-full flex flex-col max-w-md mx-auto relative bg-slate-50 shadow-2xl overflow-hidden">
-        
+
+        <!-- Banner -->
         <div class="relative w-full h-[220px] flex-shrink-0 z-0">
-            <img src="Korea_trip.png" onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'" alt="Osaka Banner" class="w-full h-full object-cover">
+            <img src="Korea_trip.png"
+                 onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
+                 alt="Korea Banner"
+                 class="w-full h-full object-cover">
             <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+            <!-- Tab Bar -->
             <div class="absolute -bottom-6 left-0 right-0 px-4 z-20 flex justify-center">
                 <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
                     <button @click="currentTab = 'itinerary'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'itinerary' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400 hover:text-ice-500']">行程</button>
@@ -47,77 +48,72 @@
             </div>
         </div>
 
+        <!-- Main Content -->
         <div class="flex-1 mt-8 bg-slate-50 z-10 relative overflow-hidden flex flex-col">
-            
+
+            <!-- ===== 行程 Tab ===== -->
             <div v-if="currentTab === 'itinerary'" class="h-full flex flex-col animate-fade-in relative">
                 <div class="bg-slate-50 z-20">
                     <div class="flex items-center px-4 py-3 gap-2">
-            
+                        <!-- 前一天 -->
                         <button @click="addPrevDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
                             <i class="fa-solid fa-angle-left text-lg"></i>
                             <span class="text-[8px] font-bold">前一天</span>
                         </button>
-
+                        <!-- 日期選擇 -->
                         <div class="flex-1 flex overflow-x-auto hide-scrollbar space-x-3 items-center py-2">
-                            <div v-for="date in dates" :key="date.full" 
-                                 @click="selectedDate = date.full" 
-                                 :class="['relative flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl transition-all cursor-pointer border-2 flex-shrink-0', selectedDate === date.full ? 'bg-ice-600 text-white border-ice-600 shadow-lg scale-105 z-10' : 'bg-white text-slate-400 border-transparent shadow-sm']">
-                    
-                        <button v-if="selectedDate === date.full && dates.length > 1" 
-                                @click.stop="deleteDate(date.full)"
-                                class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-20">
-                            <i class="fa-solid fa-xmark text-[10px]"></i>
+                            <div v-for="date in dates" :key="date.full"
+                                 @click="selectedDate = date.full"
+                                 :class="['relative flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl transition-all cursor-pointer border-2 flex-shrink-0',
+                                          selectedDate === date.full ? 'bg-ice-600 text-white border-ice-600 shadow-lg scale-105 z-10' : 'bg-white text-slate-400 border-transparent shadow-sm']">
+                                <button v-if="selectedDate === date.full && dates.length > 1"
+                                        @click.stop="deleteDate(date.full)"
+                                        class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-20">
+                                    <i class="fa-solid fa-xmark text-[10px]"></i>
+                                </button>
+                                <span class="text-xs font-medium">{{ date.day }}</span>
+                                <span class="text-lg font-bold">{{ date.date }}</span>
+                            </div>
+                        </div>
+                        <!-- 後一天 -->
+                        <button @click="addNextDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
+                            <i class="fa-solid fa-angle-right text-lg"></i>
+                            <span class="text-[8px] font-bold">後一天</span>
                         </button>
-
-                        <span class="text-xs font-medium">{{ date.day }}</span>
-                        <span class="text-lg font-bold">{{ date.date }}</span>
-                </div>
-            </div>
-
-            <button @click="addNextDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
-                <i class="fa-solid fa-angle-right text-lg"></i>
-                <span class="text-[8px] font-bold">後一天</span>
-            </button>
-                 
                     </div>
                 </div>
 
                 <div class="flex-1 overflow-y-auto px-4 pb-24 space-y-6 pt-2">
-
-                <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
-    
-                    <div v-for="w in weatherList" :key="w.city" 
-                        class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
-        
-                        <div class="absolute -right-1 -top-4 text-ice-50 opacity-60 text-6xl rotate-12 pointer-events-none">
-                            <i :class="w.icon"></i>
-                        </div>
-        
-                        <div class="z-10 flex items-center gap-3">
-                            <i :class="w.icon" class="text-2xl text-ice-500"></i>
-                            <div class="flex items-baseline gap-2">
-                                <h2 class="text-2xl font-black text-slate-800">{{ w.temp }}°</h2>
-                                <p class="text-[10px] text-slate-400 font-bold">體感 {{ w.feel }}°</p>
+                    <!-- 天氣 -->
+                    <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
+                        <div v-for="w in weatherList" :key="w.city"
+                             class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
+                            <div class="absolute -right-1 -top-4 text-ice-50 opacity-60 text-6xl rotate-12 pointer-events-none">
+                                <i :class="w.icon"></i>
+                            </div>
+                            <div class="z-10 flex items-center gap-3">
+                                <i :class="w.icon" class="text-2xl text-ice-500"></i>
+                                <div class="flex items-baseline gap-2">
+                                    <h2 class="text-2xl font-black text-slate-800">{{ w.temp }}°</h2>
+                                    <p class="text-[10px] text-slate-400 font-bold">體感 {{ w.feel }}°</p>
+                                </div>
+                            </div>
+                            <div class="z-10 flex flex-col items-end">
+                                <span class="bg-ice-100 text-ice-600 text-[9px] font-bold px-2 py-0.5 rounded-full mb-0.5">TODAY</span>
+                                <span class="text-[10px] text-slate-400">{{ w.city }}</span>
                             </div>
                         </div>
-        
-                        <div class="z-10 flex flex-col items-end">
-                            <span class="bg-ice-100 text-ice-600 text-[9px] font-bold px-2 py-0.5 rounded-full mb-0.5">TODAY</span>
-                            <span class="text-[10px] text-slate-400">{{ w.city }}</span>
-                        </div>
-                   </div>
-               </div>
+                    </div>
 
+                    <!-- 行程時間軸 -->
                     <div class="relative pl-2">
                         <div class="absolute left-[29px] top-4 bottom-0 w-0.5 dashed-line z-0"></div>
-
-                        <div v-for="(item, index) in currentItinerary" :key="item.id" 
+                        <div v-for="(item, index) in currentItinerary" :key="item.id"
                              class="relative flex gap-4 mb-8 group"
-                             draggable="true" 
-                             @dragstart="dragStart(index)" 
-                             @dragover.prevent 
+                             draggable="true"
+                             @dragstart="dragStart(index)"
+                             @dragover.prevent
                              @drop="drop(index)">
-                            
                             <div class="flex flex-col items-center z-10 flex-shrink-0 w-14">
                                 <div class="w-12 h-12 rounded-full bg-ice-500 text-white flex items-center justify-center shadow-lg border-4 border-slate-50 transform transition-transform group-hover:scale-110">
                                     <i :class="getCategoryIcon(item.category)" class="text-lg"></i>
@@ -126,10 +122,9 @@
                                     {{ item.time }}
                                 </div>
                             </div>
-
                             <div class="flex-1 min-w-0">
                                 <div class="rounded-2xl shadow-soft bg-white relative overflow-hidden transition-all active:scale-95 border border-white">
-                                    
+                                    <!-- 航班卡片 -->
                                     <div v-if="item.category === '航班'" class="cursor-move">
                                         <div class="bg-ice-50 px-4 py-3 border-b border-ice-100 flex justify-between items-center">
                                             <span class="text-ice-600 font-bold text-sm">航班資訊</span>
@@ -155,7 +150,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="text-center">
-                                                    <div class="text-2xl font-bold text-slate-800">{{ item.flight?.to || 'KIX' }}</div>
+                                                    <div class="text-2xl font-bold text-slate-800">{{ item.flight?.to || 'ICN' }}</div>
                                                     <div class="text-xs text-slate-400">{{ item.flight?.arr || '10:40' }}</div>
                                                 </div>
                                             </div>
@@ -164,7 +159,7 @@
                                             <div v-if="item.note" class="text-xs text-slate-400 text-center mt-2 break-words whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">{{ item.note }}</div>
                                         </div>
                                     </div>
-
+                                    <!-- 一般卡片 -->
                                     <div v-else class="flex h-full min-h-[80px]">
                                         <div class="flex-1 p-4 cursor-move flex flex-col justify-center select-none">
                                             <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">{{ item.name }}</h3>
@@ -182,26 +177,26 @@
                                             </button>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
-
                         <div v-if="currentItinerary.length === 0" class="flex flex-col items-center justify-center py-10 text-slate-400">
                             <i class="fa-regular fa-calendar text-2xl mb-2"></i>
                             <p class="text-sm">尚無行程，點擊右下角新增</p>
                         </div>
                     </div>
                 </div>
-
+                <!-- 新增按鈕 -->
                 <button @click="openAddModal" class="absolute bottom-6 right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
                     <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
 
+            <!-- ===== 資訊 Tab ===== -->
             <div v-if="currentTab === 'info'" class="h-full overflow-y-auto p-4 pb-24 space-y-4 animate-fade-in bg-slate-50">
                 <h2 class="text-2xl font-bold text-slate-800 ml-1">旅遊資訊</h2>
 
+                <!-- 匯率換算 -->
                 <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center">
@@ -214,7 +209,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl mb-4">
                         <div class="flex-1">
                             <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">KRW</label>
@@ -224,11 +218,10 @@
                         <div class="flex-1 text-right">
                             <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">TWD</label>
                             <div class="text-xl font-bold text-ice-600">
-                                {{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) :0 }}
+                                {{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) : 0 }}
                             </div>
                         </div>
                     </div>
-
                     <div class="border-t border-slate-100 pt-4 mt-2">
                         <div class="flex justify-between items-center mb-3">
                             <div class="flex items-center gap-2">
@@ -240,11 +233,11 @@
                                     <p class="text-[10px] text-slate-400">含 1.5% 海外手續費</p>
                                 </div>
                             </div>
-                            <a href="https://twrates.com/card/visa/usd.html" target="_blank" class="text-[10px] text-ice-500 flex items-center bg-ice-50 px-3 py-1.5 rounded-full hover:bg-ice-100 transition-colors font-bold">
+                            <a href="https://twrates.com/card/visa/usd.html" target="_blank"
+                               class="text-[10px] text-ice-500 flex items-center bg-ice-50 px-3 py-1.5 rounded-full hover:bg-ice-100 transition-colors font-bold">
                                 詳細比價 <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[8px]"></i>
                             </a>
                         </div>
-                        
                         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
                             <div>
                                 <p class="text-[10px] text-slate-400 font-bold mb-1">預估匯率</p>
@@ -254,11 +247,11 @@
                             <div class="text-right">
                                 <p class="text-[10px] text-slate-400 font-bold mb-1">約合台幣</p>
                                 <p class="text-2xl font-black text-blue-600">
-                                    {{ calcrw ? (calcKrw * exchangeRate * 1.015).toFixed(0) : 0 }} <span class="text-xs font-bold text-slate-400">TWD</span>
+                                    {{ calcKrw ? (calcKrw * exchangeRate * 1.015).toFixed(0) : 0 }}
+                                    <span class="text-xs font-bold text-slate-400">TWD</span>
                                 </p>
                             </div>
                         </div>
-                        
                         <div class="flex gap-2 mt-3 justify-center opacity-50 grayscale hover:grayscale-0 transition-all">
                             <i class="fa-brands fa-cc-visa text-xl"></i>
                             <i class="fa-brands fa-cc-mastercard text-xl"></i>
@@ -267,64 +260,51 @@
                     </div>
                 </div>
 
-            <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
-    
-                <div class="flex items-center gap-2 mb-3">
-                    <h3 class="font-bold text-slate-800">住宿飯店</h3>
-                    <button @click="showHotelModal = true" 
-                            class="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 hover:text-white transition-all active:scale-90 shadow-sm">
-                        <i class="fa-solid fa-plus text-[10px]"></i>
-                    </button>
-                </div>
-
-                <div class="h-[180px] overflow-y-auto snap-y snap-mandatory no-scrollbar">
-                    <div v-for="hotel in hotelList" :key="hotel.id" 
-                         class="h-full snap-start flex flex-col justify-center border-b border-slate-50 last:border-none pb-2">
-            
-                        <div class="flex items-center mb-2">
-                            <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mr-3 text-xs">
-                                <i class="fa-solid fa-bed"></i>
-                            </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-base text-slate-800 truncate">{{ hotel.name }}</h4>
-                            <p class="text-xs text-slate-400 truncate">{{ hotel.address }}</p>
-                        </div>
-                        </div>
-            
-                        <div class="flex gap-3 mt-2">
-                            <button @click="openMap(hotel.address + ' ' + hotel.name)" 
-                                    class="flex-1 bg-slate-800 text-white py-2 rounded-xl text-xs font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                                <i class="fa-solid fa-location-dot"></i> 導航
-                            </button>
-                            <a :href="'tel:' + hotel.phone" 
-                               class="w-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center hover:bg-slate-200 active:scale-95 transition-transform">
-                                <i class="fa-solid fa-phone text-xs"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-                
-                <!--<div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
-                    <div class="flex items-center mb-3">
-                        <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3"><i class="fa-solid fa-bed"></i></div>
+                <!-- 住宿飯店 -->
+                <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
+                    <div class="flex items-center gap-2 mb-3">
                         <h3 class="font-bold text-slate-800">住宿飯店</h3>
+                        <button @click="showHotelModal = true"
+                                class="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 hover:text-white transition-all active:scale-90 shadow-sm">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                        </button>
                     </div>
-                    <div class="pl-2">
-                        <h4 class="font-bold text-lg text-slate-800">Eslead Hotel Namba South I</h4>
-                        <p class="text-sm text-slate-400 mt-1 mb-4">大阪市浪速区日本橋西1-1-12</p>
-                        <div class="flex gap-3">
-                            <button @click="openMap('大阪市浪速区日本橋西1-1-12 Eslead Hotel Namba South 1')" class="flex-1 bg-slate-800 text-white py-2.5 rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-location-dot"></i> 導航
-                            </button>
-                            <a href="tel:+81666361111" class="w-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center hover:bg-slate-200">
-                                <i class="fa-solid fa-phone"></i>
-                            </a>
+                    <div class="h-[180px] overflow-y-auto snap-y snap-mandatory no-scrollbar">
+                        <div v-for="hotel in hotelList" :key="hotel.id"
+                             class="h-full snap-start flex flex-col justify-center border-b border-slate-50 last:border-none pb-2">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mr-3 text-xs">
+                                    <i class="fa-solid fa-bed"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-base text-slate-800 truncate">{{ hotel.name }}</h4>
+                                    <p class="text-xs text-slate-400 truncate">{{ hotel.address }}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 mt-2">
+                                <button @click="openMap(hotel.address + ' ' + hotel.name)"
+                                        class="flex-1 bg-slate-800 text-white py-2 rounded-xl text-xs font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                                    <i class="fa-solid fa-location-dot"></i> 導航
+                                </button>
+                                <a :href="'tel:' + hotel.phone"
+                                   class="w-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center hover:bg-slate-200 active:scale-95 transition-transform">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                </a>
+                                <button @click="deleteHotel(hotel.id)"
+                                        class="w-10 bg-red-50 text-red-400 rounded-xl flex items-center justify-center hover:bg-red-100 active:scale-95 transition-transform">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 空狀態 -->
+                        <div v-if="hotelList.length === 0" class="h-full flex flex-col items-center justify-center text-slate-300">
+                            <i class="fa-solid fa-hotel text-3xl mb-2"></i>
+                            <p class="text-xs">尚未新增飯店</p>
                         </div>
                     </div>
                 </div>
-                -->
 
+                <!-- 行程備份 -->
                 <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100 mb-8">
                     <div class="flex items-center mb-3">
                         <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mr-3">
@@ -347,41 +327,45 @@
                 </div>
             </div>
 
+            <!-- ===== 購物 Tab ===== -->
             <div v-if="currentTab === 'shopping'" class="h-full overflow-y-auto p-4 pb-24 animate-fade-in bg-slate-50">
                 <h2 class="text-2xl font-bold text-slate-800 mb-4 ml-1">購物清單</h2>
                 <div class="grid grid-cols-2 gap-4">
-                    <div v-for="(item, idx) in shoppingList" :key="idx" class="bg-white p-3 rounded-2xl shadow-soft border border-slate-100 relative group overflow-hidden">
+                    <div v-for="(item, idx) in shoppingList" :key="idx"
+                         class="bg-white p-3 rounded-2xl shadow-soft border border-slate-100 relative group overflow-hidden">
                         <div class="aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden relative">
                             <img v-if="item.image" :src="item.image" class="w-full h-full object-cover">
-                            <div v-else class="w-full h-full flex items-center justify-center text-slate-300"><i class="fa-solid fa-image text-3xl"></i></div>
-                            
-                            <button @click.stop="removeShoppingItem(idx)" class="absolute top-2 right-2 w-7 h-7 bg-white/90 text-red-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100 z-10">
+                            <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
+                                <i class="fa-solid fa-image text-3xl"></i>
+                            </div>
+                            <button @click.stop="removeShoppingItem(idx)"
+                                    class="absolute top-2 right-2 w-7 h-7 bg-white/90 text-red-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100 z-10">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
-
-                            <button @click.stop="openShopModal(item, idx)" class="absolute bottom-2 right-2 w-7 h-7 bg-white/90 text-ice-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100 z-10">
+                            <button @click.stop="openShopModal(item, idx)"
+                                    class="absolute bottom-2 right-2 w-7 h-7 bg-white/90 text-ice-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100 z-10">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                         </div>
                         <h4 class="font-bold text-slate-800 text-sm truncate">{{ item.name }}</h4>
                     </div>
-                    
-                    <div @click="openShopModal()" class="border-2 border-dashed border-ice-200 rounded-2xl flex flex-col items-center justify-center aspect-square cursor-pointer text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-colors">
+                    <div @click="openShopModal()"
+                         class="border-2 border-dashed border-ice-200 rounded-2xl flex flex-col items-center justify-center aspect-square cursor-pointer text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-colors">
                         <i class="fa-solid fa-camera mb-2 text-2xl"></i>
                         <span class="text-xs font-bold">新增物品</span>
                     </div>
                 </div>
             </div>
 
+            <!-- ===== 花費 Tab ===== -->
             <div v-if="currentTab === 'expenses'" class="h-full flex flex-col animate-fade-in bg-slate-50">
                 <div class="bg-white p-6 pb-4 rounded-b-3xl shadow-soft z-10">
                     <p class="text-slate-400 text-xs font-bold tracking-wider uppercase mb-2">Total Expenses</p>
-                    
                     <div class="flex justify-between items-end mb-4 border-b border-slate-100 pb-4">
                         <div>
                             <div class="flex items-baseline">
-                                <span class="text-xl font-bold text-slate-800 mr-1">¥</span>
-                                <h2 class="text-4xl font-black text-slate-800 tracking-tighter">{{ expensesStats.jpy.toLocaleString() }}</h2>
+                                <span class="text-xl font-bold text-slate-800 mr-1">₩</span>
+                                <h2 class="text-4xl font-black text-slate-800 tracking-tighter">{{ expensesStats.krw.toLocaleString() }}</h2>
                             </div>
                             <p class="text-[10px] text-slate-400 font-medium">韓幣總計</p>
                         </div>
@@ -393,7 +377,7 @@
                             <p class="text-[10px] text-ice-400 font-medium">台幣總計 (約)</p>
                         </div>
                     </div>
-
+                    <!-- 星展回饋卡 -->
                     <div class="bg-slate-800 rounded-2xl p-4 text-white relative overflow-hidden shadow-lg">
                         <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
                         <div class="flex justify-between items-start mb-2 relative z-10">
@@ -418,19 +402,21 @@
                                 </div>
                             </div>
                             <div class="overflow-hidden h-2 mb-1 text-xs flex rounded bg-slate-600">
-                                <div :style="{ width: dbsStats.percent + '%' }" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-teal-400 to-emerald-500 transition-all duration-500"></div>
+                                <div :style="{ width: dbsStats.percent + '%' }"
+                                     class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-teal-400 to-emerald-500 transition-all duration-500">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- 花費清單 -->
                 <div class="flex-1 overflow-y-auto p-4 pb-24 space-y-3 pt-4">
-                    <div v-for="(exp, idx) in expenses" :key="exp.id" 
+                    <div v-for="(exp, idx) in expenses" :key="exp.id"
                          @click="openExpenseModal(exp)"
                          class="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center justify-between active:scale-95 transition-transform cursor-pointer relative group">
-                        
                         <div class="flex items-center gap-4">
-                            <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg', 
+                            <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg',
                                 exp.payment === '星展信用卡' ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-500']">
                                 <i :class="getCategoryIcon(exp.category)"></i>
                             </div>
@@ -445,10 +431,10 @@
                         </div>
                         <div class="text-right">
                             <span class="block font-bold text-slate-700 text-lg">
-                                {{ exp.currency === 'TWD' ? 'NT$' : '¥' }}{{ parseInt(exp.amount).toLocaleString() }}
+                                {{ exp.currency === 'TWD' ? 'NT$' : '₩' }}{{ parseInt(exp.amount).toLocaleString() }}
                             </span>
                             <span v-if="exp.currency === 'TWD'" class="text-[10px] text-slate-400 block text-right">
-                                (約 ¥{{ (exp.amount / exchangeRate).toFixed(0) }})
+                                (約 ₩{{ (exp.amount / exchangeRate).toFixed(0) }})
                             </span>
                             <span v-else class="text-[10px] text-slate-400 block text-right">
                                 (約 NT${{ (exp.amount * exchangeRate).toFixed(0) }})
@@ -456,53 +442,71 @@
                             <i class="fa-solid fa-pen text-slate-200 text-xs absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
-                    
                     <div v-if="expenses.length === 0" class="text-center py-10 text-slate-400">
                         <p class="text-sm">尚無消費紀錄</p>
                     </div>
                 </div>
-
                 <button @click="openExpenseModal()" class="absolute bottom-6 right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
                     <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
-
         </div>
 
+        <!-- ===== Modal: 新增/編輯行程 ===== -->
         <div v-if="showModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="font-bold text-xl text-slate-800">{{ isEditing ? '編輯行程' : '新增行程' }}</h3>
-                    <button @click="closeModal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                    <button @click="closeModal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">名稱</label>
-                        <input v-model="form.name" placeholder="例: 樂天世界" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 focus:ring-2 focus:ring-ice-400 outline-none">
+                        <input v-model="form.name" placeholder="例: 樂天世界"
+                               class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 focus:ring-2 focus:ring-ice-400 outline-none">
                     </div>
                     <div class="flex gap-3">
                         <div class="flex-1">
                             <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">分類</label>
                             <select v-model="form.category" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 outline-none">
-                                <option value="景點">景點</option><option value="美食">美食</option><option value="購物">購物</option><option value="住宿">住宿</option><option value="航班">航班</option><option value="其他">其他</option>
+                                <option value="景點">景點</option>
+                                <option value="美食">美食</option>
+                                <option value="購物">購物</option>
+                                <option value="住宿">住宿</option>
+                                <option value="交通">交通</option>
+                                <option value="航班">航班</option>
+                                <option value="其他">其他</option>
                             </select>
                         </div>
                         <div class="flex-1">
                             <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">時間</label>
-                            <input v-model="form.time" type="time" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 outline-none">
+                            <input v-model="form.time" type="time"
+                                   class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 outline-none">
                         </div>
                     </div>
-                     <div>
+                    <div>
                         <label class="text-xs font-bold text-slate-400 ml-1 mb-2 block">交通方式</label>
                         <div class="flex bg-slate-50 p-1 rounded-xl">
-                            <button @click="form.transportMode = 'walk'" :class="['flex-1 py-2 rounded-lg text-xs font-bold transition-all', form.transportMode === 'walk' ? 'bg-white shadow text-ice-500' : 'text-slate-400']"><i class="fa-solid fa-person-walking mr-1"></i>步行</button>
-                            <button @click="form.transportMode = 'train'" :class="['flex-1 py-2 rounded-lg text-xs font-bold transition-all', form.transportMode === 'train' ? 'bg-white shadow text-ice-500' : 'text-slate-400']"><i class="fa-solid fa-train-subway mr-1"></i>電車</button>
-                            <button @click="form.transportMode = 'car'" :class="['flex-1 py-2 rounded-lg text-xs font-bold transition-all', form.transportMode === 'car' ? 'bg-white shadow text-ice-500' : 'text-slate-400']"><i class="fa-solid fa-car mr-1"></i>車</button>
+                            <button @click="form.transportMode = 'walk'"
+                                    :class="['flex-1 py-2 rounded-lg text-xs font-bold transition-all', form.transportMode === 'walk' ? 'bg-white shadow text-ice-500' : 'text-slate-400']">
+                                <i class="fa-solid fa-person-walking mr-1"></i>步行
+                            </button>
+                            <button @click="form.transportMode = 'train'"
+                                    :class="['flex-1 py-2 rounded-lg text-xs font-bold transition-all', form.transportMode === 'train' ? 'bg-white shadow text-ice-500' : 'text-slate-400']">
+                                <i class="fa-solid fa-train-subway mr-1"></i>電車
+                            </button>
+                            <button @click="form.transportMode = 'car'"
+                                    :class="['flex-1 py-2 rounded-lg text-xs font-bold transition-all', form.transportMode === 'car' ? 'bg-white shadow text-ice-500' : 'text-slate-400']">
+                                <i class="fa-solid fa-car mr-1"></i>車
+                            </button>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">備註</label>
-                        <textarea v-model="form.note" placeholder="備註 / 門票資訊" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-medium text-slate-600 focus:ring-2 focus:ring-ice-400 outline-none h-24 resize-none"></textarea>
+                        <textarea v-model="form.note" placeholder="備註 / 門票資訊"
+                                  class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-medium text-slate-600 focus:ring-2 focus:ring-ice-400 outline-none h-24 resize-none"></textarea>
                     </div>
                 </div>
                 <div class="flex gap-3 mt-8">
@@ -511,12 +515,13 @@
                 </div>
             </div>
         </div>
-        
+
+        <!-- ===== Modal: 購物清單 ===== -->
         <div v-if="showShopModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-             <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
                 <h3 class="font-bold text-xl mb-4 text-slate-800">{{ shopForm.index > -1 ? '編輯物品' : '新增購物清單' }}</h3>
-                
-                <input v-model="shopForm.name" placeholder="商品名稱" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold mb-4 outline-none">
+                <input v-model="shopForm.name" placeholder="商品名稱"
+                       class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold mb-4 outline-none">
                 <label class="block w-full bg-slate-50 p-8 rounded-2xl text-center text-slate-400 border-2 border-dashed border-slate-200 cursor-pointer hover:bg-ice-50 hover:border-ice-200 transition-colors">
                     <i class="fa-solid fa-camera mr-2"></i> {{ shopForm.image ? '更換圖片' : '上傳圖片' }}
                     <input type="file" @change="handleImageUpload" class="hidden" accept="image/*">
@@ -526,52 +531,95 @@
                 </div>
                 <div class="flex gap-3 mt-6">
                     <button @click="showShopModal = false" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm">取消</button>
-                    <button @click="saveShopItem" class="flex-1 bg-ice-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg">{{ shopForm.index > -1 ? '儲存' : '新增' }}</button>
+                    <button @click="saveShopItem" class="flex-1 bg-ice-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg">
+                        {{ shopForm.index > -1 ? '儲存' : '新增' }}
+                    </button>
                 </div>
             </div>
         </div>
 
+        <!-- ===== Modal: 新增/編輯消費 ===== -->
         <div v-if="showExpenseModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-             <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="font-bold text-xl text-slate-800">{{ expenseForm.id ? '編輯消費' : '新增消費' }}</h3>
-                    <button @click="showExpenseModal = false" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                    <button @click="showExpenseModal = false" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
-                
                 <div class="space-y-4">
-                    <input type="date" v-model="expenseForm.date" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
-                    <input v-model="expenseForm.name" placeholder="項目名稱" class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none">
-                    
+                    <input type="date" v-model="expenseForm.date"
+                           class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
+                    <input v-model="expenseForm.name" placeholder="項目名稱"
+                           class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none">
                     <div class="relative flex items-center">
-                        <select v-model="expenseForm.currency" class="bg-slate-100 p-4 rounded-l-xl text-sm font-bold border-r border-slate-200 outline-none text-slate-600 w-24 appearance-none text-center">
-                            <option value="JPY">¥ JPY</option>
+                        <select v-model="expenseForm.currency"
+                                class="bg-slate-100 p-4 rounded-l-xl text-sm font-bold border-r border-slate-200 outline-none text-slate-600 w-24 appearance-none text-center">
+                            <option value="KRW">₩ KRW</option>
                             <option value="TWD">NT$ TWD</option>
                         </select>
-                        <input v-model="expenseForm.amount" type="number" placeholder="金額" class="flex-1 min-w-0 bg-slate-50 p-4 rounded-r-xl text-lg font-bold border-0 outline-none text-slate-800">
+                        <input v-model="expenseForm.amount" type="number" placeholder="金額"
+                               class="flex-1 min-w-0 bg-slate-50 p-4 rounded-r-xl text-lg font-bold border-0 outline-none text-slate-800">
                     </div>
-
                     <div class="flex gap-3">
-                        <select v-model="expenseForm.category" class="flex-1 bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
-                            <option value="飲食">飲食</option><option value="交通">交通</option><option value="購物">購物</option><option value="住宿">住宿</option><option value="其他">其他</option>
+                        <select v-model="expenseForm.category"
+                                class="flex-1 bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
+                            <option value="飲食">飲食</option>
+                            <option value="交通">交通</option>
+                            <option value="購物">購物</option>
+                            <option value="住宿">住宿</option>
+                            <option value="其他">其他</option>
                         </select>
-                        <select v-model="expenseForm.payment" class="flex-1 bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
+                        <select v-model="expenseForm.payment"
+                                class="flex-1 bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
                             <option value="現金">現金</option>
                             <option value="信用卡">信用卡</option>
-                            <option v-if="expenseForm.currency === 'JPY'" value="星展信用卡">星展信用卡</option>
+                            <option v-if="expenseForm.currency === 'KRW'" value="星展信用卡">星展信用卡</option>
                         </select>
                     </div>
                 </div>
-                
                 <div class="flex gap-3 mt-8">
                     <button v-if="expenseForm.id" @click="deleteExpense" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl font-bold text-sm hover:bg-red-100">刪除</button>
                     <button v-else @click="showExpenseModal = false" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm">取消</button>
                     <button @click="saveExpense" class="flex-[2] bg-ice-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg">儲存</button>
                 </div>
-             </div>
+            </div>
+        </div>
+
+        <!-- ===== Modal: 新增飯店 ===== -->
+        <div v-if="showHotelModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-xl text-slate-800">新增飯店</h3>
+                    <button @click="showHotelModal = false" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">飯店名稱 *</label>
+                        <input v-model="hotelForm.name" placeholder="例: 首爾明洞飯店"
+                               class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 focus:ring-2 focus:ring-ice-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">地址 *</label>
+                        <input v-model="hotelForm.address" placeholder="例: 首爾市中區明洞길 74"
+                               class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 focus:ring-2 focus:ring-ice-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">電話</label>
+                        <input v-model="hotelForm.phone" placeholder="例: +82-2-1234-5678"
+                               class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 focus:ring-2 focus:ring-ice-400 outline-none">
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-8">
+                    <button @click="showHotelModal = false" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold text-sm">取消</button>
+                    <button @click="saveHotel" class="flex-[2] bg-ice-500 text-white py-4 rounded-xl font-bold text-sm shadow-lg hover:bg-ice-600">儲存</button>
+                </div>
+            </div>
         </div>
 
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>
