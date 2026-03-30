@@ -1,4 +1,4 @@
-    const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
+        const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
 createApp({
     setup() {
         const currentTab = ref('itinerary');
@@ -194,7 +194,32 @@ createApp({
         watch(shoppingList, (newVal) => localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(newVal)), { deep: true });
         watch(expenses, (newVal) => localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(newVal)), { deep: true });
 
-        onMounted(() => { loadSavedData(); getWeather(); getExchangeRate(); });
+        // 動態偵測視窗高度
+        const setAppHeight = () => {
+            const vh = window.innerHeight;
+            document.documentElement.style.setProperty('--app-height', `${vh}px`);
+    
+           // 偵測底部安全區域（iOS Home Bar / Android 導航列）
+            const safeBottom = parseInt(
+                getComputedStyle(document.documentElement)
+                  .getPropertyValue('env(safe-area-inset-bottom)') || '0'
+            );
+            document.documentElement.style.setProperty(
+                '--safe-bottom', 
+                `${Math.max(safeBottom, 16)}px`
+            );
+        };
+
+        onMounted(() => { loadSavedData(); getWeather(); getExchangeRate(); 
+            // 初始執行
+            setAppHeight();
+    
+            // 視窗大小改變時重新計算（旋轉螢幕、鍵盤彈出等）
+            window.addEventListener('resize', setAppHeight);
+            // iOS Safari 網址列顯示/隱藏時觸發
+            window.addEventListener('orientationchange', () => {setTimeout(setAppHeight, 100); 
+                                                               });
+        });
 
         const showModal = ref(false);
         const isEditing = ref(false);
