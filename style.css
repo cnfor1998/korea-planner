@@ -1,5 +1,7 @@
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 body { background-color: #f8fafc; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
@@ -8,18 +10,15 @@ body { background-color: #f8fafc; }
     background-size: 2px 12px;
     background-repeat: repeat-y;
 }
-/* 移除原本的 iOS 修正，改用 CSS 變數 */
 :root {
     --app-height: 100vh;
     --safe-bottom: 0px;
 }
-
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
 }
-
 #app {
     height: var(--app-height);
 }
