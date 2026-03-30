@@ -1,4 +1,4 @@
-        const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
+const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
 createApp({
     setup() {
         const currentTab = ref('itinerary');
@@ -6,7 +6,6 @@ createApp({
         const calcKrw = ref(null);
         const exchangeRate = ref(0.024);
 
-        // --- Data storage Key ---
         const STORAGE_KEYS = {
             ITINERARY: 'korea_trip_itinerary_v2',
             SHOPPING: 'korea_trip_shopping_v1',
@@ -18,12 +17,11 @@ createApp({
             { city: '釜山', lat: 35.1796, lon: 129.0756, temp: '-', feel: '-', icon: 'fa-solid fa-spinner fa-spin' }
         ]);
 
-        // --- API Function ---
         const getWeather = async () => {
             for (let weather of weatherList.value) {
                 try {
                     const response = await fetch(
-                        `https://api.open-meteo.com/v1/forecast?latitude=${weather.lat}&longitude=${weather.lon}&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FSeoul`
+                        `https://api.open-meteo.com/v1/forecast?latitude=${weather.lat}&longitude=${weather.lon}&current=temperature_2m,apparent_temperature,weather_code&timezone=Asia%2FSeoul&forecast_days=1&models=best_match`
                     );
                     const data = await response.json();
                     weather.temp = Math.round(data.current.temperature_2m);
@@ -56,7 +54,6 @@ createApp({
             { full: '2026-04-06', day: '週一', date: '06' },
         ]);
 
-        // Helper: Format date object
         const getFormattedDate = (dateObj) => {
             const yyyy = dateObj.getFullYear();
             const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -67,18 +64,13 @@ createApp({
             return { full: fullDate, day: dayStr, date: dd };
         };
 
-        // Function: Add one day
         const addNextDate = () => {
             const lastDate = dates[dates.length - 1];
             const currentIdx = dates.findIndex(d => d.full === selectedDate.value);
-    
-            // 如果目前選的不是最後一天，直接跳到下一天
             if (currentIdx < dates.length - 1) {
                 selectedDate.value = dates[currentIdx + 1].full;
                 return;
             }
-    
-            // 已經是最後一天，才新增
             const nextDate = new Date(lastDate.full);
             nextDate.setDate(nextDate.getDate() + 1);
             const newDate = getFormattedDate(nextDate);
@@ -88,21 +80,16 @@ createApp({
             setTimeout(() => {
                 const container = document.querySelector('.overflow-x-auto');
                 if (container) container.scrollLeft = container.scrollWidth;
-                }, 100);
+            }, 100);
         };
 
-        // Function: Add one day forward
         const addPrevDate = () => {
             const firstDate = dates[0];
             const currentIdx = dates.findIndex(d => d.full === selectedDate.value);
-    
-            // 如果目前選的不是第一天，直接跳到上一天
             if (currentIdx > 0) {
                 selectedDate.value = dates[currentIdx - 1].full;
                 return;
             }
-    
-            // 已經是第一天，才新增
             const prevDate = new Date(firstDate.full);
             prevDate.setDate(prevDate.getDate() - 1);
             const newDate = getFormattedDate(prevDate);
@@ -112,7 +99,7 @@ createApp({
             setTimeout(() => {
                 const container = document.querySelector('.overflow-x-auto');
                 if (container) container.scrollLeft = 0;
-        }, 100);
+            }, 100);
         };
 
         const deleteDate = (targetFull) => {
@@ -129,7 +116,7 @@ createApp({
             selectedDate.value = dates[newIdx].full;
         };
 
-        const hotelList = reactive(JSON.parse(localStorage.getItem('my_hotels')) || [  
+        const hotelList = reactive(JSON.parse(localStorage.getItem('my_hotels')) || [
             { id: 1, name: '首爾飯店範本', address: '首爾特別市鐘路區...', phone: '+8221234567' }
         ]);
 
@@ -164,7 +151,6 @@ createApp({
         const shoppingList = reactive([]);
         const expenses = reactive([]);
 
-        // --- Read and store logic ---
         const loadSavedData = () => {
             const savedItinerary = localStorage.getItem(STORAGE_KEYS.ITINERARY);
             if (savedItinerary) {
@@ -194,48 +180,83 @@ createApp({
         watch(shoppingList, (newVal) => localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(newVal)), { deep: true });
         watch(expenses, (newVal) => localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(newVal)), { deep: true });
 
-        // 動態偵測視窗高度
         const setAppHeight = () => {
             const vh = window.innerHeight;
             document.documentElement.style.setProperty('--app-height', `${vh}px`);
-    
-           // 偵測底部安全區域（iOS Home Bar / Android 導航列）
             const safeBottom = parseInt(
                 getComputedStyle(document.documentElement)
-                  .getPropertyValue('env(safe-area-inset-bottom)') || '0'
+                    .getPropertyValue('env(safe-area-inset-bottom)') || '0'
             );
             document.documentElement.style.setProperty(
-                '--safe-bottom', 
+                '--safe-bottom',
                 `${Math.max(safeBottom, 16)}px`
             );
         };
 
-        onMounted(() => { loadSavedData(); getWeather(); getExchangeRate(); 
-            // 初始執行
+        onMounted(() => {
+            loadSavedData();
+            getWeather();
+            getExchangeRate();
             setAppHeight();
-    
-            // 視窗大小改變時重新計算（旋轉螢幕、鍵盤彈出等）
             window.addEventListener('resize', setAppHeight);
-            // iOS Safari 網址列顯示/隱藏時觸發
-            window.addEventListener('orientationchange', () => {setTimeout(setAppHeight, 100); 
-                                                               });
+            window.addEventListener('orientationchange', () => {
+                setTimeout(setAppHeight, 100);
+            });
         });
 
         const showModal = ref(false);
         const isEditing = ref(false);
         const form = reactive({ id: null, name: '', time: '', category: '景點', note: '', transportMode: 'walk' });
-
         const showShopModal = ref(false);
         const shopForm = reactive({ index: -1, name: '', image: null });
-
         const showExpenseModal = ref(false);
         const expenseForm = reactive({
             id: null, date: '2026-04-02', name: '', amount: '',
             category: '飲食', payment: '現金', currency: 'KRW'
         });
 
+        // 展開備註的行程 id 集合
+        const expandedItems = ref(new Set());
+        const toggleExpand = (id) => {
+            const s = new Set(expandedItems.value);
+            if (s.has(id)) s.delete(id);
+            else s.add(id);
+            expandedItems.value = s;
+        };
+        const isExpanded = (id) => expandedItems.value.has(id);
+
+        // 玉山 unicard 回饋計算
+        const esunStats = computed(() => {
+            const esunExpenses = expenses.filter(e => e.payment === '玉山unicard');
+            const totalSpent = esunExpenses.reduce((sum, item) => {
+                let amountTWD = 0;
+                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
+                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+                return sum + amountTWD;
+            }, 0);
+            const spentTWD = Math.round(totalSpent);
+            const reward = Math.round(spentTWD * 0.045);
+            return { spent: spentTWD, reward };
+        });
+
+        // 中信 LINE Pay 回饋計算
+        const ctbcStats = computed(() => {
+            const ctbcExpenses = expenses.filter(e => e.payment === '中信linepay');
+            const totalSpent = ctbcExpenses.reduce((sum, item) => {
+                let amountTWD = 0;
+                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
+                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+                return sum + amountTWD;
+            }, 0);
+            const spentTWD = Math.round(totalSpent);
+            // 一般 2.8%，之後可以加 isSpecial 開關
+            const rewardNormal = Math.round(spentTWD * 0.028);
+            const rewardSpecial = Math.round(spentTWD * 0.10);
+            return { spent: spentTWD, rewardNormal, rewardSpecial };
+        });
+
         watch(() => expenseForm.currency, (newVal) => {
-            if (newVal === 'TWD' && expenseForm.payment === '星展信用卡') {
+            if (newVal === 'TWD' && (expenseForm.payment === '玉山unicard' || expenseForm.payment === '中信linepay')) {
                 expenseForm.payment = '信用卡';
             }
         });
@@ -258,25 +279,6 @@ createApp({
             return { krw: Math.round(totalKRW), twd: Math.round(totalTWD) };
         });
 
-        const dbsStats = computed(() => {
-            const dbsExpenses = expenses.filter(e => e.payment === '星展信用卡');
-            const totalSpent = dbsExpenses.reduce((sum, item) => {
-                let amountTWD = 0;
-                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
-                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
-                return sum + amountTWD;
-            }, 0);
-            const spentTWD = Math.round(totalSpent);
-            const baseReward = Math.round(spentTWD * 0.01);
-            const bonusCap = 600;
-            const bonusRate = 0.04;
-            const bonusLimitTWD = 15000;
-            const bonusReward = Math.min(Math.round(spentTWD * bonusRate), bonusCap);
-            const totalReward = baseReward + bonusReward;
-            const percent = Math.min(Math.round((spentTWD / bonusLimitTWD) * 100), 100);
-            return { spent: spentTWD, reward: totalReward, percent: percent };
-        });
-
         const formatDate = (d) => d;
 
         const getCategoryIcon = (c) => {
@@ -292,7 +294,9 @@ createApp({
             return `fa-solid ${map[m] || 'fa-person-walking'}`;
         };
 
-        const openMap = (k) => k && window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}`, '_blank');
+        const openMap = (k) => k && window.open(
+            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}`, '_blank'
+        );
 
         const openAddModal = () => {
             isEditing.value = false;
@@ -444,23 +448,4 @@ createApp({
                     }
                 } catch (err) { console.error(err); alert('檔案格式錯誤，無法匯入。'); }
             };
-            reader.readAsText(file);
-            event.target.value = '';
-        };
-
-        return {
-            currentTab, dates, selectedDate, formatDate,
-            hotelList, showHotelModal, hotelForm, saveHotel, deleteHotel,
-            itineraryData, currentItinerary,
-            shoppingList, expenses, expensesStats, dbsStats,
-            calcKrw, exchangeRate, weatherList,
-            getCategoryIcon, getTransportIcon, openMap,
-            showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal,
-            dragStart, drop,
-            showShopModal, shopForm, openShopModal, handleImageUpload, saveShopItem, removeShoppingItem,
-            showExpenseModal, expenseForm, openExpenseModal, saveExpense, deleteExpense,
-            exportData, importData,
-            addNextDate, addPrevDate, deleteDate
-        };
-    }
-}).mount('#app');
+            reader.read
