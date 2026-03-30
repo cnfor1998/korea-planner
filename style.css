@@ -8,3 +8,18 @@ body { background-color: #f8fafc; }
     background-size: 2px 12px;
     background-repeat: repeat-y;
 }
+/* 移除原本的 iOS 修正，改用 CSS 變數 */
+:root {
+    --app-height: 100vh;
+    --safe-bottom: 0px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    height: var(--app-height);
+}
