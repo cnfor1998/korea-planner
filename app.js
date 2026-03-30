@@ -151,6 +151,12 @@ createApp({
         const shoppingList = reactive([]);
         const expenses = reactive([]);
 
+        // 控制行程卡片備註展開狀態
+        const expandedItems = reactive({});
+        const toggleExpand = (id) => {
+            expandedItems[id] = !expandedItems[id];
+        };
+
         const loadSavedData = () => {
             const savedItinerary = localStorage.getItem(STORAGE_KEYS.ITINERARY);
             if (savedItinerary) {
@@ -215,48 +221,8 @@ createApp({
             category: '飲食', payment: '現金', currency: 'KRW'
         });
 
-        // 展開備註的行程 id 集合
-        const expandedItems = ref(new Set());
-        const toggleExpand = (id) => {
-            const s = new Set(expandedItems.value);
-            if (s.has(id)) s.delete(id);
-            else s.add(id);
-            expandedItems.value = s;
-        };
-        const isExpanded = (id) => expandedItems.value.has(id);
-
-        // 玉山 unicard 回饋計算
-        const esunStats = computed(() => {
-            const esunExpenses = expenses.filter(e => e.payment === '玉山unicard');
-            const totalSpent = esunExpenses.reduce((sum, item) => {
-                let amountTWD = 0;
-                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
-                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
-                return sum + amountTWD;
-            }, 0);
-            const spentTWD = Math.round(totalSpent);
-            const reward = Math.round(spentTWD * 0.045);
-            return { spent: spentTWD, reward };
-        });
-
-        // 中信 LINE Pay 回饋計算
-        const ctbcStats = computed(() => {
-            const ctbcExpenses = expenses.filter(e => e.payment === '中信linepay');
-            const totalSpent = ctbcExpenses.reduce((sum, item) => {
-                let amountTWD = 0;
-                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
-                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
-                return sum + amountTWD;
-            }, 0);
-            const spentTWD = Math.round(totalSpent);
-            // 一般 2.8%，之後可以加 isSpecial 開關
-            const rewardNormal = Math.round(spentTWD * 0.028);
-            const rewardSpecial = Math.round(spentTWD * 0.10);
-            return { spent: spentTWD, rewardNormal, rewardSpecial };
-        });
-
         watch(() => expenseForm.currency, (newVal) => {
-            if (newVal === 'TWD' && (expenseForm.payment === '玉山unicard' || expenseForm.payment === '中信linepay')) {
+            if (newVal === 'TWD' && (expenseForm.payment === '玉山Unicard' || expenseForm.payment === '中信LinePay')) {
                 expenseForm.payment = '信用卡';
             }
         });
@@ -277,6 +243,37 @@ createApp({
                 }
             });
             return { krw: Math.round(totalKRW), twd: Math.round(totalTWD) };
+        });
+
+        // 玉山 Unicard 回饋統計 (4.5%)
+        const esunStats = computed(() => {
+            const esunExpenses = expenses.filter(e => e.payment === '玉山Unicard');
+            const totalSpent = esunExpenses.reduce((sum, item) => {
+                let amountTWD = 0;
+                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
+                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+                return sum + amountTWD;
+            }, 0);
+            const spentTWD = Math.round(totalSpent);
+            const reward = Math.round(spentTWD * 0.045);
+            return { spent: spentTWD, reward };
+        });
+
+        // 中信 LinePay 回饋統計
+        const ctbcStats = computed(() => {
+            const ctbcExpenses = expenses.filter(e => e.payment === '中信LinePay');
+            const totalSpent = ctbcExpenses.reduce((sum, item) => {
+                let amountTWD = 0;
+                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
+                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+                return sum + amountTWD;
+            }, 0);
+            const spentTWD = Math.round(totalSpent);
+            // 特殊通路 10%，一般 2.8%
+            const ctbcSpecial = ref(false); // 由外部控制
+            const rate = 0.028;
+            const reward = Math.round(spentTWD * rate);
+            return { spent: spentTWD, reward };
         });
 
         const formatDate = (d) => d;
@@ -448,4 +445,24 @@ createApp({
                     }
                 } catch (err) { console.error(err); alert('檔案格式錯誤，無法匯入。'); }
             };
-            reader.read
+            reader.readAsText(file);
+            event.target.value = '';
+        };
+
+        return {
+            currentTab, dates, selectedDate, formatDate,
+            hotelList, showHotelModal, hotelForm, saveHotel, deleteHotel,
+            itineraryData, currentItinerary,
+            expandedItems, toggleExpand,
+            shoppingList, expenses, expensesStats, esunStats, ctbcStats,
+            calcKrw, exchangeRate, weatherList,
+            getCategoryIcon, getTransportIcon, openMap,
+            showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal,
+            dragStart, drop,
+            showShopModal, shopForm, openShopModal, handleImageUpload, saveShopItem, removeShoppingItem,
+            showExpenseModal, expenseForm, openExpenseModal, saveExpense, deleteExpense,
+            exportData, importData,
+            addNextDate, addPrevDate, deleteDate
+        };
+    }
+}).mount('#app');
