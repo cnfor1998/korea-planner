@@ -21,6 +21,8 @@ html, body {
 }
 #app {
     height: var(--app-height);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .line-clamp-2 {
     display: -webkit-box;
