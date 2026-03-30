@@ -9,7 +9,8 @@ createApp({
         const STORAGE_KEYS = {
             ITINERARY: 'korea_trip_itinerary_v2',
             SHOPPING: 'korea_trip_shopping_v1',
-            EXPENSES: 'korea_trip_expenses_v1'
+            EXPENSES: 'korea_trip_expenses_v1',
+            SPLIT: 'korea_trip_split_v1'
         };
 
         const weatherList = ref([
@@ -103,10 +104,7 @@ createApp({
         };
 
         const deleteDate = (targetFull) => {
-            if (dates.length <= 1) {
-                alert("至少需要保留一天行程！");
-                return;
-            }
+            if (dates.length <= 1) { alert("至少需要保留一天行程！"); return; }
             if (!confirm(`確定要刪除 ${targetFull} 及其所有行程嗎？`)) return;
             const idx = dates.findIndex(d => d.full === targetFull);
             if (idx === -1) return;
@@ -119,7 +117,6 @@ createApp({
         const hotelList = reactive(JSON.parse(localStorage.getItem('my_hotels')) || [
             { id: 1, name: '首爾飯店範本', address: '首爾特別市鐘路區...', phone: '+8221234567' }
         ]);
-
         const showHotelModal = ref(false);
         const hotelForm = reactive({ name: '', address: '', phone: '' });
 
@@ -140,22 +137,25 @@ createApp({
         };
 
         const defaultItinerary = {
-            '2026-04-02': [],
-            '2026-04-03': [],
-            '2026-04-04': [],
-            '2026-04-05': [],
-            '2026-04-06': []
+            '2026-04-02': [], '2026-04-03': [], '2026-04-04': [],
+            '2026-04-05': [], '2026-04-06': []
         };
 
         const itineraryData = reactive({ ...defaultItinerary });
         const shoppingList = reactive([]);
         const expenses = reactive([]);
 
-        // 控制行程卡片備註展開狀態
+        // 分帳設定
+        const splitSettings = reactive(
+            JSON.parse(localStorage.getItem(STORAGE_KEYS.SPLIT)) || {
+                person1: '旅伴1',
+                person2: '旅伴2'
+            }
+        );
+        watch(splitSettings, (v) => localStorage.setItem(STORAGE_KEYS.SPLIT, JSON.stringify(v)), { deep: true });
+
         const expandedItems = reactive({});
-        const toggleExpand = (id) => {
-            expandedItems[id] = !expandedItems[id];
-        };
+        const toggleExpand = (id) => { expandedItems[id] = !expandedItems[id]; };
 
         const loadSavedData = () => {
             const savedItinerary = localStorage.getItem(STORAGE_KEYS.ITINERARY);
@@ -182,21 +182,17 @@ createApp({
             }
         };
 
-        watch(itineraryData, (newVal) => localStorage.setItem(STORAGE_KEYS.ITINERARY, JSON.stringify(newVal)), { deep: true });
-        watch(shoppingList, (newVal) => localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(newVal)), { deep: true });
-        watch(expenses, (newVal) => localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(newVal)), { deep: true });
+        watch(itineraryData, (v) => localStorage.setItem(STORAGE_KEYS.ITINERARY, JSON.stringify(v)), { deep: true });
+        watch(shoppingList, (v) => localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(v)), { deep: true });
+        watch(expenses, (v) => localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(v)), { deep: true });
 
         const setAppHeight = () => {
             const vh = window.innerHeight;
             document.documentElement.style.setProperty('--app-height', `${vh}px`);
             const safeBottom = parseInt(
-                getComputedStyle(document.documentElement)
-                    .getPropertyValue('env(safe-area-inset-bottom)') || '0'
+                getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0'
             );
-            document.documentElement.style.setProperty(
-                '--safe-bottom',
-                `${Math.max(safeBottom, 16)}px`
-            );
+            document.documentElement.style.setProperty('--safe-bottom', `${Math.max(safeBottom, 16)}px`);
         };
 
         onMounted(() => {
@@ -205,20 +201,36 @@ createApp({
             getExchangeRate();
             setAppHeight();
             window.addEventListener('resize', setAppHeight);
-            window.addEventListener('orientationchange', () => {
-                setTimeout(setAppHeight, 100);
-            });
+            window.addEventListener('orientationchange', () => { setTimeout(setAppHeight, 100); });
         });
 
         const showModal = ref(false);
         const isEditing = ref(false);
-        const form = reactive({ id: null, name: '', time: '', category: '景點', note: '', transportMode: 'walk' });
+        // 新增 flight 欄位
+        const form = reactive({
+            id: null, name: '', time: '', category: '景點', note: '', transportMode: 'walk',
+            flight: { from: '', dep: '', to: '', arr: '', no: '', terminal: '' }
+        });
+
         const showShopModal = ref(false);
         const shopForm = reactive({ index: -1, name: '', image: null });
         const showExpenseModal = ref(false);
+
+        // 分帳 form
         const expenseForm = reactive({
             id: null, date: '2026-04-02', name: '', amount: '',
-            category: '飲食', payment: '現金', currency: 'KRW'
+            category: '飲食', payment: '現金', currency: 'KRW',
+            ctbcRate: '2.8',
+            splitEnabled: false,
+            splitP1: true,
+            splitP2: true,
+            splitP1Pct: 50,
+            splitP2Pct: 50
+        });
+
+        // 中信利率切換時同步百分比
+        watch(() => expenseForm.splitP1Pct, (v) => {
+            expenseForm.splitP2Pct = 100 - v;
         });
 
         watch(() => expenseForm.currency, (newVal) => {
@@ -230,50 +242,84 @@ createApp({
         const currentItinerary = computed(() => itineraryData[selectedDate.value] || []);
 
         const expensesStats = computed(() => {
-            let totalKRW = 0;
-            let totalTWD = 0;
+            let totalKRW = 0, totalTWD = 0;
             expenses.forEach(item => {
                 const val = parseInt(item.amount || 0);
-                if (item.currency === 'TWD') {
-                    totalTWD += val;
-                    totalKRW += (val / exchangeRate.value);
-                } else {
-                    totalKRW += val;
-                    totalTWD += (val * exchangeRate.value);
-                }
+                if (item.currency === 'TWD') { totalTWD += val; totalKRW += (val / exchangeRate.value); }
+                else { totalKRW += val; totalTWD += (val * exchangeRate.value); }
             });
             return { krw: Math.round(totalKRW), twd: Math.round(totalTWD) };
         });
 
-        // 玉山 Unicard 回饋統計 (4.5%)
+        // 玉山回饋
         const esunStats = computed(() => {
-            const esunExpenses = expenses.filter(e => e.payment === '玉山Unicard');
-            const totalSpent = esunExpenses.reduce((sum, item) => {
-                let amountTWD = 0;
-                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
-                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
-                return sum + amountTWD;
+            const list = expenses.filter(e => e.payment === '玉山Unicard');
+            const totalSpent = list.reduce((sum, item) => {
+                if (item.currency === 'TWD') return sum + parseInt(item.amount || 0);
+                return sum + parseInt(item.amount || 0) * exchangeRate.value * 1.015;
             }, 0);
             const spentTWD = Math.round(totalSpent);
-            const reward = Math.round(spentTWD * 0.045);
+            return { spent: spentTWD, reward: Math.round(spentTWD * 0.045) };
+        });
+
+        // 中信回饋
+        const ctbcStats = computed(() => {
+            const list = expenses.filter(e => e.payment === '中信LinePay');
+            const totalSpent = list.reduce((sum, item) => {
+                if (item.currency === 'TWD') return sum + parseInt(item.amount || 0);
+                return sum + parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+            }, 0);
+            const spentTWD = Math.round(totalSpent);
+            // 分別計算兩種費率
+            const general = list.filter(e => e.ctbcRate === '2.8');
+            const special = list.filter(e => e.ctbcRate === '10');
+            const generalAmt = general.reduce((sum, item) => {
+                if (item.currency === 'TWD') return sum + parseInt(item.amount || 0);
+                return sum + parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+            }, 0);
+            const specialAmt = special.reduce((sum, item) => {
+                if (item.currency === 'TWD') return sum + parseInt(item.amount || 0);
+                return sum + parseInt(item.amount || 0) * exchangeRate.value * 1.015;
+            }, 0);
+            const reward = Math.round(generalAmt * 0.028 + specialAmt * 0.10);
             return { spent: spentTWD, reward };
         });
 
-        // 中信 LinePay 回饋統計
-        const ctbcStats = computed(() => {
-            const ctbcExpenses = expenses.filter(e => e.payment === '中信LinePay');
-            const totalSpent = ctbcExpenses.reduce((sum, item) => {
-                let amountTWD = 0;
-                if (item.currency === 'TWD') amountTWD = parseInt(item.amount || 0);
-                else amountTWD = parseInt(item.amount || 0) * exchangeRate.value * 1.015;
-                return sum + amountTWD;
-            }, 0);
-            const spentTWD = Math.round(totalSpent);
-            // 特殊通路 10%，一般 2.8%
-            const ctbcSpecial = ref(false); // 由外部控制
-            const rate = 0.028;
-            const reward = Math.round(spentTWD * rate);
-            return { spent: spentTWD, reward };
+        // 分帳統計
+        const splitStats = computed(() => {
+            let p1Total = 0, p2Total = 0;
+            expenses.forEach(item => {
+                if (!item.splitEnabled) return;
+                let amtTWD = 0;
+                const val = parseInt(item.amount || 0);
+                if (item.currency === 'TWD') amtTWD = val;
+                else amtTWD = val * exchangeRate.value;
+
+                if (item.splitP1 && item.splitP2) {
+                    const p1Pct = (item.splitP1Pct || 50) / 100;
+                    const p2Pct = (item.splitP2Pct || 50) / 100;
+                    p1Total += amtTWD * p1Pct;
+                    p2Total += amtTWD * p2Pct;
+                } else if (item.splitP1) {
+                    p1Total += amtTWD;
+                } else if (item.splitP2) {
+                    p2Total += amtTWD;
+                }
+            });
+            p1Total = Math.round(p1Total);
+            p2Total = Math.round(p2Total);
+            const diff = Math.abs(p1Total - p2Total);
+            let settlement = '';
+            if (diff > 0) {
+                if (p1Total > p2Total) {
+                    settlement = `${splitSettings.person2} 需付 ${splitSettings.person1} NT$${diff.toLocaleString()}`;
+                } else {
+                    settlement = `${splitSettings.person1} 需付 ${splitSettings.person2} NT$${diff.toLocaleString()}`;
+                }
+            } else {
+                settlement = '目前帳目已平！';
+            }
+            return { p1Total, p2Total, settlement };
         });
 
         const formatDate = (d) => d;
@@ -297,20 +343,34 @@ createApp({
 
         const openAddModal = () => {
             isEditing.value = false;
-            Object.assign(form, { id: Date.now(), name: '', time: '', category: '景點', note: '', transportMode: 'walk' });
+            Object.assign(form, {
+                id: Date.now(), name: '', time: '', category: '景點', note: '', transportMode: 'walk',
+                flight: { from: '', dep: '', to: '', arr: '', no: '', terminal: '' }
+            });
             showModal.value = true;
         };
 
-        const editItem = (item) => { isEditing.value = true; Object.assign(form, item); showModal.value = true; };
+        const editItem = (item) => {
+            isEditing.value = true;
+            Object.assign(form, {
+                ...item,
+                flight: item.flight ? { ...item.flight } : { from: '', dep: '', to: '', arr: '', no: '', terminal: '' }
+            });
+            showModal.value = true;
+        };
 
         const saveItem = () => {
             if (!itineraryData[selectedDate.value]) itineraryData[selectedDate.value] = [];
             const list = itineraryData[selectedDate.value];
+            const saveData = { ...form };
+            if (form.category === '航班') {
+                saveData.flight = { ...form.flight };
+            }
             if (isEditing.value) {
                 const idx = list.findIndex(i => i.id === form.id);
-                if (idx !== -1) list[idx] = { ...form };
+                if (idx !== -1) list[idx] = saveData;
             } else {
-                list.push({ ...form });
+                list.push(saveData);
             }
             list.sort((a, b) => a.time.localeCompare(b.time));
             showModal.value = false;
@@ -367,13 +427,12 @@ createApp({
                         let width = img.width, height = img.height;
                         if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
                         canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                         resolve(canvas.toDataURL('image/jpeg', quality));
                     };
-                    img.onerror = (error) => reject(error);
+                    img.onerror = (e) => reject(e);
                 };
-                reader.onerror = (error) => reject(error);
+                reader.onerror = (e) => reject(e);
             });
         };
 
@@ -386,21 +445,37 @@ createApp({
         };
 
         const openExpenseModal = (item = null) => {
-            if (item) Object.assign(expenseForm, item);
-            else Object.assign(expenseForm, {
-                id: null, date: selectedDate.value, name: '',
-                amount: '', category: '飲食', payment: '現金', currency: 'KRW'
-            });
+            if (item) {
+                Object.assign(expenseForm, {
+                    ...item,
+                    ctbcRate: item.ctbcRate || '2.8',
+                    splitEnabled: item.splitEnabled || false,
+                    splitP1: item.splitP1 !== undefined ? item.splitP1 : true,
+                    splitP2: item.splitP2 !== undefined ? item.splitP2 : true,
+                    splitP1Pct: item.splitP1Pct || 50,
+                    splitP2Pct: item.splitP2Pct || 50
+                });
+            } else {
+                Object.assign(expenseForm, {
+                    id: null, date: selectedDate.value, name: '', amount: '',
+                    category: '飲食', payment: '現金', currency: 'KRW',
+                    ctbcRate: '2.8',
+                    splitEnabled: false,
+                    splitP1: true, splitP2: true,
+                    splitP1Pct: 50, splitP2Pct: 50
+                });
+            }
             showExpenseModal.value = true;
         };
 
         const saveExpense = () => {
             if (expenseForm.amount) {
+                const data = { ...expenseForm };
                 if (expenseForm.id) {
                     const idx = expenses.findIndex(e => e.id === expenseForm.id);
-                    if (idx !== -1) expenses[idx] = { ...expenseForm };
+                    if (idx !== -1) expenses[idx] = data;
                 } else {
-                    expenses.unshift({ ...expenseForm, id: Date.now() });
+                    expenses.unshift({ ...data, id: Date.now() });
                 }
                 showExpenseModal.value = false;
             }
@@ -421,8 +496,7 @@ createApp({
             const a = document.createElement('a');
             a.href = url;
             a.download = `韓國行程備份_${new Date().toISOString().slice(0, 10)}.json`;
-            document.body.appendChild(a);
-            a.click();
+            document.body.appendChild(a); a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         };
@@ -435,15 +509,12 @@ createApp({
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (confirm('匯入將會覆蓋目前手機上的所有資料，確定嗎？')) {
-                        if (parsed.itinerary) {
-                            for (const key in itineraryData) delete itineraryData[key];
-                            Object.assign(itineraryData, parsed.itinerary);
-                        }
+                        if (parsed.itinerary) { for (const key in itineraryData) delete itineraryData[key]; Object.assign(itineraryData, parsed.itinerary); }
                         if (parsed.shopping) shoppingList.splice(0, shoppingList.length, ...parsed.shopping);
                         if (parsed.expenses) expenses.splice(0, expenses.length, ...parsed.expenses);
                         alert('匯入成功！資料已同步。');
                     }
-                } catch (err) { console.error(err); alert('檔案格式錯誤，無法匯入。'); }
+                } catch (err) { alert('檔案格式錯誤，無法匯入。'); }
             };
             reader.readAsText(file);
             event.target.value = '';
@@ -454,6 +525,7 @@ createApp({
             hotelList, showHotelModal, hotelForm, saveHotel, deleteHotel,
             itineraryData, currentItinerary,
             expandedItems, toggleExpand,
+            splitSettings, splitStats,
             shoppingList, expenses, expensesStats, esunStats, ctbcStats,
             calcKrw, exchangeRate, weatherList,
             getCategoryIcon, getTransportIcon, openMap,
