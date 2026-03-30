@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>韓國之旅</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,8 +30,8 @@
         }
     </script>
 </head>
-<body class="bg-slate-50 text-slate-700 h-screen overflow-hidden font-sans">
-    <div id="app" class="h-full flex flex-col max-w-md mx-auto relative bg-slate-50 shadow-2xl overflow-hidden">
+<body class="bg-slate-50 text-slate-700 overflow-hidden font-sans">
+    <div id="app" class="flex flex-col max-w-md mx-auto relative bg-slate-50 shadow-2xl overflow-hidden">
 
         <!-- Banner -->
         <div class="relative w-full h-[220px] flex-shrink-0 z-0">
@@ -83,7 +86,8 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto px-4 pb-24 space-y-6 pt-2">
+                <div class="flex-1 overflow-y-auto px-4 space-y-6 pt-2"
+                     style="padding-bottom: calc(6rem + var(--safe-bottom))">
                     <!-- 天氣 -->
                     <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
                         <div v-for="w in weatherList" :key="w.city"
@@ -187,13 +191,16 @@
                     </div>
                 </div>
                 <!-- 新增按鈕 -->
-                <button @click="openAddModal" class="absolute bottom-6 right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
-                    <i class="fa-solid fa-plus"></i>
+                <button @click="openAddModal
+                    style="bottom: calc(1.5rem + var(--safe-bottom))"
+                    class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
+                 <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
 
             <!-- ===== 資訊 Tab ===== -->
-            <div v-if="currentTab === 'info'" class="h-full overflow-y-auto p-4 pb-24 space-y-4 animate-fade-in bg-slate-50">
+            <div v-if="currentTab === 'info'" class="h-full overflow-y-auto p-4 space-y-4 animate-fade-in bg-slate-50"
+              style="padding-bottom: calc(6rem + var(--safe-bottom))">
                 <h2 class="text-2xl font-bold text-slate-800 ml-1">旅遊資訊</h2>
 
                 <!-- 匯率換算 -->
@@ -328,7 +335,8 @@
             </div>
 
             <!-- ===== 購物 Tab ===== -->
-            <div v-if="currentTab === 'shopping'" class="h-full overflow-y-auto p-4 pb-24 animate-fade-in bg-slate-50">
+            <div v-if="currentTab === 'shopping'" class="h-full overflow-y-auto p-4 animate-fade-in bg-slate-50"
+              style="padding-bottom: calc(6rem + var(--safe-bottom))">
                 <h2 class="text-2xl font-bold text-slate-800 mb-4 ml-1">購物清單</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div v-for="(item, idx) in shoppingList" :key="idx"
@@ -411,7 +419,8 @@
                 </div>
 
                 <!-- 花費清單 -->
-                <div class="flex-1 overflow-y-auto p-4 pb-24 space-y-3 pt-4">
+                <div class="flex-1 overflow-y-auto p-4 space-y-3 pt-4"
+                   style="padding-bottom: calc(6rem + var(--safe-bottom))">
                     <div v-for="(exp, idx) in expenses" :key="exp.id"
                          @click="openExpenseModal(exp)"
                          class="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center justify-between active:scale-95 transition-transform cursor-pointer relative group">
@@ -446,8 +455,10 @@
                         <p class="text-sm">尚無消費紀錄</p>
                     </div>
                 </div>
-                <button @click="openExpenseModal()" class="absolute bottom-6 right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
-                    <i class="fa-solid fa-plus"></i>
+                <button @click="openExpenseModal()" 
+                    style="bottom: calc(1.5rem + var(--safe-bottom))"
+                    class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
+                 <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
         </div>
