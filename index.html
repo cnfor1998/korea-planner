@@ -36,8 +36,7 @@
     <div class="relative w-full h-[220px] flex-shrink-0 z-0">
         <img src="Korea_trip.png"
              onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
-             alt="Korea Banner"
-             class="w-full h-full object-cover">
+             alt="Korea Banner" class="w-full h-full object-cover">
         <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
         <div class="absolute -bottom-6 left-0 right-0 px-4 z-20 flex justify-center">
             <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
@@ -133,29 +132,26 @@
                                             <button @click.stop="openMap(item.name)" class="w-7 h-7 rounded-full bg-white text-ice-500 flex items-center justify-center hover:bg-ice-100 shadow-sm border border-ice-100">
                                                 <i class="fa-solid fa-location-arrow text-xs"></i>
                                             </button>
-                                            <button @click.stop="editItem(item)" class="w-7 h-7 rounded-full bg-white text-slate-400 flex items-center justify-center hover:text-ice-500 hover:bg-slate-50 shadow-sm border border-slate-100">
+                                            <button @click.stop="editItem(item)" class="w-7 h-7 rounded-full bg-white text-slate-400 flex items-center justify-center hover:text-ice-500 shadow-sm border border-slate-100">
                                                 <i class="fa-solid fa-pen text-xs"></i>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="p-4">
                                         <div class="flex justify-between items-center">
-                                            <!-- 出發 -->
                                             <div class="text-center">
-                                                <div class="text-2xl font-bold text-slate-800">{{ item.flight?.from || '' }}</div>
-                                                <div class="text-xs text-slate-400">{{ item.flight?.dep || '' }}</div>
+                                                <div class="text-2xl font-bold text-slate-800">{{ item.flight?.from }}</div>
+                                                <div class="text-xs text-slate-400">{{ item.flight?.dep }}</div>
                                             </div>
-                                            <!-- 中間航班號 -->
                                             <div class="flex flex-col items-center px-2 flex-1">
                                                 <div v-if="item.flight?.no" class="text-[10px] text-ice-500 font-bold mb-1">{{ item.flight.no }}</div>
                                                 <div class="w-full h-[1px] bg-ice-200 relative">
                                                     <i class="fa-solid fa-plane absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-ice-400 text-xs bg-white px-1"></i>
                                                 </div>
                                             </div>
-                                            <!-- 抵達 -->
                                             <div class="text-center">
-                                                <div class="text-2xl font-bold text-slate-800">{{ item.flight?.to || '' }}</div>
-                                                <div class="text-xs text-slate-400">{{ item.flight?.arr || '' }}</div>
+                                                <div class="text-2xl font-bold text-slate-800">{{ item.flight?.to }}</div>
+                                                <div class="text-xs text-slate-400">{{ item.flight?.arr }}</div>
                                             </div>
                                         </div>
                                         <div class="mt-3 text-sm font-bold text-slate-700 text-center">{{ item.name }}</div>
@@ -165,7 +161,6 @@
                                 </div>
 
                                 <!-- 一般卡片 -->
-                                <!-- 修改點1：備註超過2行折疊，編輯鈕固定不被吃掉 -->
                                 <div v-else class="flex h-full min-h-[80px]">
                                     <div class="flex-1 p-4 flex flex-col justify-center select-none min-w-0">
                                         <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">{{ item.name }}</h3>
@@ -174,8 +169,7 @@
                                         </div>
                                         <div v-if="item.note">
                                             <p :class="['text-xs text-slate-400 break-words whitespace-pre-wrap', expandedItems[item.id] ? '' : 'line-clamp-2']">{{ item.note }}</p>
-                                            <button v-if="item.note.length > 40"
-                                                    @click.stop="toggleExpand(item.id)"
+                                            <button v-if="item.note.length > 40" @click.stop="toggleExpand(item.id)"
                                                     class="text-[10px] text-ice-500 font-bold mt-1">
                                                 {{ expandedItems[item.id] ? '收起' : '展開' }}
                                             </button>
@@ -190,7 +184,6 @@
                                         </button>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -226,25 +219,19 @@
                 </div>
                 <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl mb-4">
                     <div class="flex-1">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">KRW</label>
-                        <input type="number" v-model="calcKrw"
-                               class="w-full bg-transparent text-xl font-bold text-slate-800 focus:outline-none placeholder-slate-300"
-                               placeholder="0">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">₩ KRW</label>
+                        <input type="number" v-model="calcKrw" class="w-full bg-transparent text-xl font-bold text-slate-800 focus:outline-none placeholder-slate-300" placeholder="0">
                     </div>
                     <i class="fa-solid fa-arrow-right text-slate-300"></i>
                     <div class="flex-1 text-right">
-                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">TWD</label>
-                        <div class="text-xl font-bold text-ice-600">
-                            {{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) : 0 }}
-                        </div>
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">NT$ TWD</label>
+                        <div class="text-xl font-bold text-ice-600">{{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) : 0 }}</div>
                     </div>
                 </div>
                 <div class="border-t border-slate-100 pt-4 mt-2">
                     <div class="flex justify-between items-center mb-3">
                         <div class="flex items-center gap-2">
-                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600">
-                                <i class="fa-regular fa-credit-card"></i>
-                            </div>
+                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i class="fa-regular fa-credit-card"></i></div>
                             <div>
                                 <p class="text-xs font-bold text-slate-700">刷卡預估金額</p>
                                 <p class="text-[10px] text-slate-400">含 1.5% 海外手續費</p>
@@ -268,11 +255,6 @@
                                 <span class="text-xs font-bold text-slate-400">TWD</span>
                             </p>
                         </div>
-                    </div>
-                    <div class="flex gap-2 mt-3 justify-center opacity-50 grayscale hover:grayscale-0 transition-all">
-                        <i class="fa-brands fa-cc-visa text-xl"></i>
-                        <i class="fa-brands fa-cc-mastercard text-xl"></i>
-                        <i class="fa-brands fa-cc-jcb text-xl"></i>
                     </div>
                 </div>
             </div>
@@ -376,9 +358,9 @@
 
         <!-- ===== 花費 Tab ===== -->
         <div v-if="currentTab === 'expenses'" class="h-full flex flex-col animate-fade-in bg-slate-50">
-            <div class="bg-white p-6 pb-4 rounded-b-3xl shadow-soft z-10">
+            <div class="bg-white p-4 pb-3 rounded-b-3xl shadow-soft z-10">
                 <p class="text-slate-400 text-xs font-bold tracking-wider uppercase mb-2">Total Expenses</p>
-                <div class="flex justify-between items-end mb-4 border-b border-slate-100 pb-4">
+                <div class="flex justify-between items-end mb-3 border-b border-slate-100 pb-3">
                     <div>
                         <div class="flex items-baseline">
                             <span class="text-xl font-bold text-slate-800 mr-1">₩</span>
@@ -395,42 +377,52 @@
                     </div>
                 </div>
 
-                <!-- 修改點2：兩張信用卡回饋卡 -->
-                <div class="flex gap-3">
-                    <!-- 玉山 Unicard - 白色 -->
+                <!-- 分帳統計 -->
+                <div class="bg-slate-50 rounded-2xl p-3 mb-3 border border-slate-100">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-600">
+                            <i class="fa-solid fa-scale-balanced mr-1 text-ice-500"></i>分帳結算
+                        </span>
+                        <span class="text-[10px] font-bold text-ice-500">{{ splitStats.settlement }}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="flex-1 bg-white rounded-xl p-2 text-center border border-slate-100">
+                            <p class="text-[10px] text-slate-400 font-bold">{{ splitSettings.person1 }}</p>
+                            <p class="text-sm font-black text-slate-800">NT${{ splitStats.p1Total.toLocaleString() }}</p>
+                        </div>
+                        <div class="flex-1 bg-white rounded-xl p-2 text-center border border-slate-100">
+                            <p class="text-[10px] text-slate-400 font-bold">{{ splitSettings.person2 }}</p>
+                            <p class="text-sm font-black text-slate-800">NT${{ splitStats.p2Total.toLocaleString() }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 信用卡回饋 -->
+                <div class="flex gap-2">
+                    <!-- 玉山 Unicard -->
                     <div class="flex-1 bg-white border border-slate-200 rounded-2xl p-3 relative overflow-hidden shadow-sm">
                         <div class="absolute -right-3 -top-3 w-16 h-16 bg-slate-50 rounded-full"></div>
                         <div class="relative z-10">
-                            <div class="flex items-center gap-1 mb-2">
+                            <div class="flex items-center gap-1 mb-1">
                                 <i class="fa-regular fa-credit-card text-slate-600 text-xs"></i>
                                 <span class="text-[10px] font-bold text-slate-600">玉山 Unicard</span>
                             </div>
-                            <div class="text-[9px] text-slate-400 mb-2">海外 4.5% 回饋</div>
-                            <div class="text-xs text-slate-500 mb-1">
-                                已刷 NT${{ esunStats.spent.toLocaleString() }}
-                            </div>
-                            <div class="text-lg font-black text-slate-800">
-                                +{{ esunStats.reward.toLocaleString() }}
-                                <span class="text-[10px] font-bold text-slate-400">點</span>
-                            </div>
+                            <div class="text-[9px] text-slate-400 mb-1">海外 4.5%</div>
+                            <div class="text-[10px] text-slate-500">已刷 NT${{ esunStats.spent.toLocaleString() }}</div>
+                            <div class="text-base font-black text-slate-800">+{{ esunStats.reward.toLocaleString() }}<span class="text-[10px] font-bold text-slate-400"> 點</span></div>
                         </div>
                     </div>
-                    <!-- 中信 LinePay - 黑色 -->
+                    <!-- 中信 LinePay -->
                     <div class="flex-1 bg-slate-800 rounded-2xl p-3 relative overflow-hidden shadow-sm">
                         <div class="absolute -right-3 -top-3 w-16 h-16 bg-white/10 rounded-full"></div>
                         <div class="relative z-10">
-                            <div class="flex items-center gap-1 mb-2">
+                            <div class="flex items-center gap-1 mb-1">
                                 <i class="fa-regular fa-credit-card text-slate-300 text-xs"></i>
                                 <span class="text-[10px] font-bold text-slate-300">中信 LinePay</span>
                             </div>
-                            <div class="text-[9px] text-slate-400 mb-2">一般 2.8% / 特殊 10%</div>
-                            <div class="text-xs text-slate-400 mb-1">
-                                已刷 NT${{ ctbcStats.spent.toLocaleString() }}
-                            </div>
-                            <div class="text-lg font-black text-white">
-                                +{{ ctbcStats.reward.toLocaleString() }}
-                                <span class="text-[10px] font-bold text-slate-400">點</span>
-                            </div>
+                            <div class="text-[9px] text-slate-400 mb-1">一般 2.8% / 特殊 10%</div>
+                            <div class="text-[10px] text-slate-400">已刷 NT${{ ctbcStats.spent.toLocaleString() }}</div>
+                            <div class="text-base font-black text-white">+{{ ctbcStats.reward.toLocaleString() }}<span class="text-[10px] font-bold text-slate-400"> 點</span></div>
                         </div>
                     </div>
                 </div>
@@ -442,35 +434,33 @@
                 <div v-for="(exp, idx) in expenses" :key="exp.id"
                      @click="openExpenseModal(exp)"
                      class="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center justify-between active:scale-95 transition-transform cursor-pointer relative group">
-                    <div class="flex items-center gap-4">
-                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg',
+                    <div class="flex items-center gap-3">
+                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0',
                             exp.payment === '玉山Unicard' ? 'bg-slate-100 text-slate-600' :
                             exp.payment === '中信LinePay' ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-500']">
                             <i :class="getCategoryIcon(exp.category)"></i>
                         </div>
                         <div>
                             <h4 class="font-bold text-sm text-slate-800">{{ exp.name }}</h4>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1 flex-wrap">
                                 <p class="text-[10px] text-slate-400 font-medium">{{ exp.date }}</p>
-                                <span v-if="exp.payment === '玉山Unicard'"
-                                      class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">玉山</span>
-                                <span v-else-if="exp.payment === '中信LinePay'"
-                                      class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded">中信</span>
+                                <span v-if="exp.payment === '玉山Unicard'" class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">玉山</span>
+                                <span v-else-if="exp.payment === '中信LinePay'" class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded">中信</span>
                                 <span v-else class="text-[9px] bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded">{{ exp.payment }}</span>
+                                <span v-if="exp.splitEnabled" class="text-[9px] bg-ice-50 text-ice-600 px-1.5 py-0.5 rounded border border-ice-100">分帳</span>
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <span class="block font-bold text-slate-700 text-lg">
+                    <div class="text-right flex-shrink-0">
+                        <span class="block font-bold text-slate-700 text-base">
                             {{ exp.currency === 'TWD' ? 'NT$' : '₩' }}{{ parseInt(exp.amount).toLocaleString() }}
                         </span>
-                        <span v-if="exp.currency === 'TWD'" class="text-[10px] text-slate-400 block text-right">
+                        <span v-if="exp.currency === 'TWD'" class="text-[10px] text-slate-400 block">
                             (約 ₩{{ (exp.amount / exchangeRate).toFixed(0) }})
                         </span>
-                        <span v-else class="text-[10px] text-slate-400 block text-right">
+                        <span v-else class="text-[10px] text-slate-400 block">
                             (約 NT${{ (exp.amount * exchangeRate).toFixed(0) }})
                         </span>
-                        <i class="fa-solid fa-pen text-slate-200 text-xs absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                     </div>
                 </div>
                 <div v-if="expenses.length === 0" class="text-center py-10 text-slate-400">
@@ -487,8 +477,8 @@
     </div>
 
     <!-- ===== Modal: 新增/編輯行程 ===== -->
-    <div v-if="showModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
+    <div v-if="showModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 shadow-2xl animate-fade-in overflow-y-auto" style="max-height: 90vh">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-xl text-slate-800">{{ isEditing ? '編輯行程' : '新增行程' }}</h3>
                 <button @click="closeModal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
@@ -520,7 +510,50 @@
                                class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 outline-none">
                     </div>
                 </div>
-                <div>
+
+                <!-- 航班額外欄位 -->
+                <div v-if="form.category === '航班'" class="bg-ice-50 p-4 rounded-2xl space-y-3 border border-ice-100">
+                    <p class="text-xs font-bold text-ice-600 mb-2"><i class="fa-solid fa-plane mr-1"></i>航班資訊</p>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="text-[10px] font-bold text-slate-400 ml-1 mb-1 block">出發機場</label>
+                            <input v-model="form.flight.from" placeholder="KHH"
+                                   class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center uppercase">
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-[10px] font-bold text-slate-400 ml-1 mb-1 block">出發時間</label>
+                            <input v-model="form.flight.dep" placeholder="06:55"
+                                   class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center">
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="text-[10px] font-bold text-slate-400 ml-1 mb-1 block">抵達機場</label>
+                            <input v-model="form.flight.to" placeholder="ICN"
+                                   class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center uppercase">
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-[10px] font-bold text-slate-400 ml-1 mb-1 block">抵達時間</label>
+                            <input v-model="form.flight.arr" placeholder="10:40"
+                                   class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center">
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="text-[10px] font-bold text-slate-400 ml-1 mb-1 block">航班號</label>
+                            <input v-model="form.flight.no" placeholder="IT284"
+                                   class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center uppercase">
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-[10px] font-bold text-slate-400 ml-1 mb-1 block">航廈</label>
+                            <input v-model="form.flight.terminal" placeholder="T1"
+                                   class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 非航班才顯示交通方式 -->
+                <div v-if="form.category !== '航班'">
                     <label class="text-xs font-bold text-slate-400 ml-1 mb-2 block">交通方式</label>
                     <div class="flex bg-slate-50 p-1 rounded-xl">
                         <button @click="form.transportMode = 'walk'"
@@ -537,13 +570,14 @@
                         </button>
                     </div>
                 </div>
+
                 <div>
                     <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">備註</label>
                     <textarea v-model="form.note" placeholder="備註 / 門票資訊"
                               class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-medium text-slate-600 focus:ring-2 focus:ring-ice-400 outline-none h-24 resize-none"></textarea>
                 </div>
             </div>
-            <div class="flex gap-3 mt-8">
+            <div class="flex gap-3 mt-6">
                 <button v-if="isEditing" @click="deleteItem" class="flex-1 bg-red-50 text-red-500 py-4 rounded-xl font-bold text-sm hover:bg-red-100">刪除</button>
                 <button @click="saveItem" class="flex-[2] bg-ice-500 text-white py-4 rounded-xl font-bold text-sm shadow-lg hover:bg-ice-600">儲存行程</button>
             </div>
@@ -573,8 +607,8 @@
     </div>
 
     <!-- ===== Modal: 新增/編輯消費 ===== -->
-    <div v-if="showExpenseModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in">
+    <div v-if="showExpenseModal" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 shadow-2xl animate-fade-in overflow-y-auto" style="max-height: 90vh">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-xl text-slate-800">{{ expenseForm.id ? '編輯消費' : '新增消費' }}</h3>
                 <button @click="showExpenseModal = false" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
@@ -586,11 +620,12 @@
                        class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
                 <input v-model="expenseForm.name" placeholder="項目名稱"
                        class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none">
+                <!-- 幣值只顯示符號 -->
                 <div class="relative flex items-center">
                     <select v-model="expenseForm.currency"
-                            class="bg-slate-100 p-4 rounded-l-xl text-sm font-bold border-r border-slate-200 outline-none text-slate-600 w-24 appearance-none text-center">
-                        <option value="KRW">₩ KRW</option>
-                        <option value="TWD">NT$ TWD</option>
+                            class="bg-slate-100 p-4 rounded-l-xl text-sm font-bold border-r border-slate-200 outline-none text-slate-600 w-16 appearance-none text-center">
+                        <option value="KRW">₩</option>
+                        <option value="TWD">NT$</option>
                     </select>
                     <input v-model="expenseForm.amount" type="number" placeholder="金額"
                            class="flex-1 min-w-0 bg-slate-50 p-4 rounded-r-xl text-lg font-bold border-0 outline-none text-slate-800">
@@ -608,12 +643,75 @@
                             class="flex-1 bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold outline-none text-slate-600">
                         <option value="現金">現金</option>
                         <option value="信用卡">信用卡</option>
-                        <option v-if="expenseForm.currency === 'KRW'" value="玉山Unicard">玉山Unicard</option>
-                        <option v-if="expenseForm.currency === 'KRW'" value="中信LinePay">中信LinePay</option>
+                        <option v-if="expenseForm.currency === 'KRW'" value="玉山Unicard">玉山</option>
+                        <option v-if="expenseForm.currency === 'KRW'" value="中信LinePay">中信</option>
                     </select>
                 </div>
+
+                <!-- 中信費率選擇 -->
+                <div v-if="expenseForm.payment === '中信LinePay'" class="bg-slate-800 rounded-2xl p-3">
+                    <p class="text-[10px] text-slate-300 font-bold mb-2">中信 LinePay 回饋費率</p>
+                    <div class="flex gap-2">
+                        <button @click="expenseForm.ctbcRate = '2.8'"
+                                :class="['flex-1 py-2 rounded-xl text-xs font-bold transition-all',
+                                         expenseForm.ctbcRate === '2.8' ? 'bg-white text-slate-800' : 'bg-slate-700 text-slate-300']">
+                            一般 2.8%
+                        </button>
+                        <button @click="expenseForm.ctbcRate = '10'"
+                                :class="['flex-1 py-2 rounded-xl text-xs font-bold transition-all',
+                                         expenseForm.ctbcRate === '10' ? 'bg-white text-slate-800' : 'bg-slate-700 text-slate-300']">
+                            特殊通路 10%
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 分帳功能 -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-700">
+                            <i class="fa-solid fa-scale-balanced mr-1 text-ice-500"></i>分帳
+                        </span>
+                        <button @click="expenseForm.splitEnabled = !expenseForm.splitEnabled"
+                                :class="['w-10 h-6 rounded-full transition-all relative', expenseForm.splitEnabled ? 'bg-ice-500' : 'bg-slate-200']">
+                            <span :class="['absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all', expenseForm.splitEnabled ? 'left-5' : 'left-1']"></span>
+                        </button>
+                    </div>
+                    <div v-if="expenseForm.splitEnabled" class="space-y-3">
+                        <!-- 分帳人勾選 -->
+                        <div class="flex gap-3">
+                            <label class="flex-1 flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-100 cursor-pointer">
+                                <input type="checkbox" v-model="expenseForm.splitP1" class="w-4 h-4 accent-sky-500">
+                                <span class="text-xs font-bold text-slate-700">{{ splitSettings.person1 }}</span>
+                            </label>
+                            <label class="flex-1 flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-100 cursor-pointer">
+                                <input type="checkbox" v-model="expenseForm.splitP2" class="w-4 h-4 accent-sky-500">
+                                <span class="text-xs font-bold text-slate-700">{{ splitSettings.person2 }}</span>
+                            </label>
+                        </div>
+                        <!-- 兩人都勾選才顯示百分比調整 -->
+                        <div v-if="expenseForm.splitP1 && expenseForm.splitP2" class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] text-slate-500 font-bold">{{ splitSettings.person1 }}</span>
+                                <span class="text-[10px] text-slate-500 font-bold">{{ splitSettings.person2 }}</span>
+                            </div>
+                            <input type="range" v-model.number="expenseForm.splitP1Pct" min="0" max="100" step="5"
+                                   class="w-full accent-sky-500">
+                            <div class="flex justify-between">
+                                <span class="text-xs font-black text-ice-600">{{ expenseForm.splitP1Pct }}%</span>
+                                <span class="text-xs font-black text-ice-600">{{ expenseForm.splitP2Pct }}%</span>
+                            </div>
+                        </div>
+                        <!-- 名字設定 -->
+                        <div class="flex gap-2 pt-1">
+                            <input v-model="splitSettings.person1" placeholder="旅伴1名字"
+                                   class="flex-1 bg-white p-2 rounded-xl text-xs font-bold outline-none border border-slate-100 text-center">
+                            <input v-model="splitSettings.person2" placeholder="旅伴2名字"
+                                   class="flex-1 bg-white p-2 rounded-xl text-xs font-bold outline-none border border-slate-100 text-center">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex gap-3 mt-8">
+            <div class="flex gap-3 mt-6">
                 <button v-if="expenseForm.id" @click="deleteExpense" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl font-bold text-sm hover:bg-red-100">刪除</button>
                 <button v-else @click="showExpenseModal = false" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-sm">取消</button>
                 <button @click="saveExpense" class="flex-[2] bg-ice-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg">儲存</button>
