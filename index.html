@@ -30,488 +30,519 @@
     </script>
 </head>
 <body>
-<div id="app" class="max-w-md mx-auto bg-slate-50 shadow-2xl font-sans text-slate-700">
-
-    <!-- Tab Bar：固定在最上層，可透視封面 -->
-    <div class="tab-bar-fixed">
-        <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
-            <button @click="currentTab = 'itinerary'"
-                    :class="['px-4 py-2 rounded-full text-sm font-bold transition-all',
-                             currentTab === 'itinerary' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">行程</button>
-            <button @click="currentTab = 'info'"
-                    :class="['px-4 py-2 rounded-full text-sm font-bold transition-all',
-                             currentTab === 'info' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">資訊</button>
-            <button @click="currentTab = 'shopping'"
-                    :class="['px-4 py-2 rounded-full text-sm font-bold transition-all',
-                             currentTab === 'shopping' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">購物</button>
-            <button @click="currentTab = 'expenses'"
-                    :class="['px-4 py-2 rounded-full text-sm font-bold transition-all',
-                             currentTab === 'expenses' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">花費</button>
-        </div>
-    </div>
+<div id="app" class="max-w-md mx-auto bg-slate-50 shadow-2xl font-sans text-slate-700"
+     style="height: var(--app-height); display: flex; flex-direction: column; overflow: hidden; position: relative;">
 
     <!-- ===== 行程 Tab ===== -->
-    <div v-if="currentTab === 'itinerary'" class="content-scroll animate-fade-in relative"
-         style="height: var(--app-height)">
+    <div v-if="currentTab === 'itinerary'"
+         class="flex flex-col animate-fade-in relative"
+         style="height: 100%; overflow: hidden;">
 
-        <!-- 封面圖（可被往上捲走） -->
-        <div class="relative w-full h-[200px] flex-shrink-0">
-            <img src="Korea_trip.png"
-                 onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
-                 alt="Korea Banner" class="w-full h-full object-cover">
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-50 to-transparent"></div>
-        </div>
+        <!-- 封面 + Tab Bar：封面可被往上捲走，Tab Bar 跟著封面 -->
+        <!-- 整個外層可滾動 -->
+        <div class="flex-1 overflow-y-auto" style="overflow-x: hidden;">
 
-        <!-- 日期列：sticky，往上捲後會固定 -->
-        <div class="sticky top-0 bg-slate-50 z-20 shadow-sm">
-            <div class="flex items-center px-4 py-3 gap-2">
-                <button @click="addPrevDate"
-                        class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
-                    <i class="fa-solid fa-angle-left text-lg"></i>
-                    <span class="text-[8px] font-bold">前一天</span>
-                </button>
-                <div class="date-scroll flex-1 flex overflow-x-auto hide-scrollbar space-x-3 items-center py-2">
-                    <div v-for="date in dates" :key="date.full"
-                         @click="selectedDate = date.full"
-                         :class="['relative flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl transition-all cursor-pointer border-2 flex-shrink-0',
-                                  selectedDate === date.full ? 'bg-ice-600 text-white border-ice-600 shadow-lg scale-105 z-10' : 'bg-white text-slate-400 border-transparent shadow-sm']">
-                        <button v-if="selectedDate === date.full && dates.length > 1"
-                                @click.stop="deleteDate(date.full)"
-                                class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-20">
-                            <i class="fa-solid fa-xmark text-[10px]"></i>
-                        </button>
-                        <span class="text-xs font-medium">{{ date.day }}</span>
-                        <span class="text-lg font-bold">{{ date.date }}</span>
-                    </div>
-                </div>
-                <button @click="addNextDate"
-                        class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
-                    <i class="fa-solid fa-angle-right text-lg"></i>
-                    <span class="text-[8px] font-bold">後一天</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- 行程內容 -->
-        <div class="px-4 pt-2" style="padding-bottom: calc(6rem + var(--safe-bottom))">
-
-            <!-- 天氣 -->
-            <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
-                <div v-for="w in weatherList" :key="w.city"
-                     class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
-                    <div class="absolute -right-1 -top-4 text-ice-50 opacity-60 text-6xl rotate-12 pointer-events-none">
-                        <i :class="w.icon"></i>
-                    </div>
-                    <div class="z-10 flex items-center gap-3">
-                        <i :class="w.icon" class="text-2xl text-ice-500"></i>
-                        <div class="flex items-baseline gap-2">
-                            <h2 class="text-2xl font-black text-slate-800">{{ w.temp }}°</h2>
-                            <p class="text-[10px] text-slate-400 font-bold">體感 {{ w.feel }}°</p>
-                        </div>
-                    </div>
-                    <div class="z-10 flex flex-col items-end">
-                        <span class="bg-ice-100 text-ice-600 text-[9px] font-bold px-2 py-0.5 rounded-full mb-0.5">TODAY</span>
-                        <span class="text-[10px] text-slate-400">{{ w.city }}</span>
+            <!-- 封面 -->
+            <div class="relative w-full h-[220px] flex-shrink-0">
+                <img src="Korea_trip.png"
+                     onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
+                     alt="Korea Banner" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                <!-- Tab Bar 在封面上 -->
+                <div class="absolute -bottom-6 left-0 right-0 px-4 z-20 flex justify-center">
+                    <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
+                        <button @click="currentTab = 'itinerary'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'itinerary' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">行程</button>
+                        <button @click="currentTab = 'info'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'info' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">資訊</button>
+                        <button @click="currentTab = 'shopping'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'shopping' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">購物</button>
+                        <button @click="currentTab = 'expenses'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'expenses' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">花費</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 行程時間軸 -->
-            <div class="relative pl-2">
-                <div class="absolute left-[29px] top-4 bottom-0 w-0.5 dashed-line z-0"></div>
-                <div v-for="(item, index) in currentItinerary" :key="item.id"
-                     class="relative flex gap-4 mb-8 group"
-                     draggable="true" @dragstart="dragStart(index)" @dragover.prevent @drop="drop(index)">
-                    <div class="flex flex-col items-center z-10 flex-shrink-0 w-14">
-                        <div class="w-12 h-12 rounded-full bg-ice-500 text-white flex items-center justify-center shadow-lg border-4 border-slate-50 transform transition-transform group-hover:scale-110">
-                            <i :class="getCategoryIcon(item.category)" class="text-lg"></i>
+            <!-- 日期列：sticky，往上捲後會黏在頂部 -->
+            <div class="sticky top-0 bg-slate-50 z-20 mt-8">
+                <div class="flex items-center px-4 py-3 gap-2">
+                    <button @click="addPrevDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
+                        <i class="fa-solid fa-angle-left text-lg"></i>
+                        <span class="text-[8px] font-bold">前一天</span>
+                    </button>
+                    <div class="date-scroll flex-1 flex overflow-x-auto hide-scrollbar space-x-3 items-center py-2">
+                        <div v-for="date in dates" :key="date.full"
+                             @click="selectedDate = date.full"
+                             :class="['relative flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-2xl transition-all cursor-pointer border-2 flex-shrink-0',
+                                      selectedDate === date.full ? 'bg-ice-600 text-white border-ice-600 shadow-lg scale-105 z-10' : 'bg-white text-slate-400 border-transparent shadow-sm']">
+                            <button v-if="selectedDate === date.full && dates.length > 1"
+                                    @click.stop="deleteDate(date.full)"
+                                    class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-20">
+                                <i class="fa-solid fa-xmark text-[10px]"></i>
+                            </button>
+                            <span class="text-xs font-medium">{{ date.day }}</span>
+                            <span class="text-lg font-bold">{{ date.date }}</span>
                         </div>
-                        <div class="mt-2 text-xs font-bold text-slate-500 bg-white/80 px-1 rounded backdrop-blur-sm">{{ item.time }}</div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="rounded-2xl shadow-soft bg-white relative overflow-hidden transition-all active:scale-95 border border-white">
-                            <!-- 航班卡片 -->
-                            <div v-if="item.category === '航班'">
-                                <div class="bg-ice-50 px-4 py-3 border-b border-ice-100 flex justify-between items-center">
-                                    <span class="text-ice-600 font-bold text-sm">航班資訊</span>
-                                    <div class="flex gap-2">
-                                        <button @click.stop="openMap(item.name)" class="w-7 h-7 rounded-full bg-white text-ice-500 flex items-center justify-center hover:bg-ice-100 shadow-sm border border-ice-100">
-                                            <i class="fa-solid fa-location-arrow text-xs"></i>
-                                        </button>
-                                        <button @click.stop="editItem(item)" class="w-7 h-7 rounded-full bg-white text-slate-400 flex items-center justify-center hover:text-ice-500 shadow-sm border border-slate-100">
-                                            <i class="fa-solid fa-pen text-xs"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="p-4">
-                                    <div class="flex justify-between items-center">
-                                        <div class="text-center">
-                                            <div class="text-2xl font-bold text-slate-800">{{ item.flight?.from }}</div>
-                                            <div class="text-xs text-slate-400">{{ item.flight?.dep }}</div>
-                                            <div v-if="item.flight?.fromTerminal" class="text-[10px] text-slate-400 mt-0.5 bg-slate-50 px-2 py-0.5 rounded">{{ item.flight.fromTerminal }}</div>
+                    <button @click="addNextDate" class="flex flex-col items-center justify-center min-w-[50px] h-[70px] rounded-2xl border-2 border-dashed border-ice-300 text-ice-400 hover:bg-ice-50 transition-all flex-shrink-0 active:scale-95">
+                        <i class="fa-solid fa-angle-right text-lg"></i>
+                        <span class="text-[8px] font-bold">後一天</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 行程內容 -->
+            <div class="px-4 pt-2" style="padding-bottom: calc(6rem + var(--safe-bottom))">
+
+                <!-- 天氣 -->
+                <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
+                    <div v-for="w in weatherList" :key="w.city"
+                         class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
+                        <div class="absolute -right-1 -top-4 text-ice-50 opacity-60 text-6xl rotate-12 pointer-events-none">
+                            <i :class="w.icon"></i>
+                        </div>
+                        <div class="z-10 flex items-center gap-3">
+                            <i :class="w.icon" class="text-2xl text-ice-500"></i>
+                            <div class="flex items-baseline gap-2">
+                                <h2 class="text-2xl font-black text-slate-800">{{ w.temp }}°</h2>
+                                <p class="text-[10px] text-slate-400 font-bold">體感 {{ w.feel }}°</p>
+                            </div>
+                        </div>
+                        <div class="z-10 flex flex-col items-end">
+                            <span class="bg-ice-100 text-ice-600 text-[9px] font-bold px-2 py-0.5 rounded-full mb-0.5">TODAY</span>
+                            <span class="text-[10px] text-slate-400">{{ w.city }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 行程時間軸 -->
+                <div class="relative pl-2">
+                    <div class="absolute left-[29px] top-4 bottom-0 w-0.5 dashed-line z-0"></div>
+                    <div v-for="(item, index) in currentItinerary" :key="item.id"
+                         class="relative flex gap-4 mb-8 group"
+                         draggable="true" @dragstart="dragStart(index)" @dragover.prevent @drop="drop(index)">
+                        <div class="flex flex-col items-center z-10 flex-shrink-0 w-14">
+                            <div class="w-12 h-12 rounded-full bg-ice-500 text-white flex items-center justify-center shadow-lg border-4 border-slate-50 transform transition-transform group-hover:scale-110">
+                                <i :class="getCategoryIcon(item.category)" class="text-lg"></i>
+                            </div>
+                            <div class="mt-2 text-xs font-bold text-slate-500 bg-white/80 px-1 rounded backdrop-blur-sm">{{ item.time }}</div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="rounded-2xl shadow-soft bg-white relative overflow-hidden transition-all active:scale-95 border border-white">
+                                <!-- 航班卡片 -->
+                                <div v-if="item.category === '航班'">
+                                    <div class="bg-ice-50 px-4 py-3 border-b border-ice-100 flex justify-between items-center">
+                                        <span class="text-ice-600 font-bold text-sm">航班資訊</span>
+                                        <div class="flex gap-2">
+                                            <button @click.stop="openMap(item.name)" class="w-7 h-7 rounded-full bg-white text-ice-500 flex items-center justify-center hover:bg-ice-100 shadow-sm border border-ice-100">
+                                                <i class="fa-solid fa-location-arrow text-xs"></i>
+                                            </button>
+                                            <button @click.stop="editItem(item)" class="w-7 h-7 rounded-full bg-white text-slate-400 flex items-center justify-center hover:text-ice-500 shadow-sm border border-slate-100">
+                                                <i class="fa-solid fa-pen text-xs"></i>
+                                            </button>
                                         </div>
-                                        <div class="flex flex-col items-center px-2 flex-1">
-                                            <div v-if="item.flight?.no" class="text-[10px] text-ice-500 font-bold mb-1">{{ item.flight.no }}</div>
-                                            <div class="w-full h-[1px] bg-ice-200 relative">
-                                                <i class="fa-solid fa-plane absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-ice-400 text-xs bg-white px-1"></i>
+                                    </div>
+                                    <div class="p-4">
+                                        <div class="flex justify-between items-center">
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-slate-800">{{ item.flight?.from }}</div>
+                                                <div class="text-xs text-slate-400">{{ item.flight?.dep }}</div>
+                                                <div v-if="item.flight?.fromTerminal" class="text-[10px] text-slate-400 mt-0.5 bg-slate-50 px-2 py-0.5 rounded">{{ item.flight.fromTerminal }}</div>
+                                            </div>
+                                            <div class="flex flex-col items-center px-2 flex-1">
+                                                <div v-if="item.flight?.no" class="text-[10px] text-ice-500 font-bold mb-1">{{ item.flight.no }}</div>
+                                                <div class="w-full h-[1px] bg-ice-200 relative">
+                                                    <i class="fa-solid fa-plane absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-ice-400 text-xs bg-white px-1"></i>
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-slate-800">{{ item.flight?.to }}</div>
+                                                <div class="text-xs text-slate-400">{{ item.flight?.arr }}</div>
+                                                <div v-if="item.flight?.toTerminal" class="text-[10px] text-slate-400 mt-0.5 bg-slate-50 px-2 py-0.5 rounded">{{ item.flight.toTerminal }}</div>
                                             </div>
                                         </div>
-                                        <div class="text-center">
-                                            <div class="text-2xl font-bold text-slate-800">{{ item.flight?.to }}</div>
-                                            <div class="text-xs text-slate-400">{{ item.flight?.arr }}</div>
-                                            <div v-if="item.flight?.toTerminal" class="text-[10px] text-slate-400 mt-0.5 bg-slate-50 px-2 py-0.5 rounded">{{ item.flight.toTerminal }}</div>
+                                        <div class="mt-3 text-sm font-bold text-slate-700 text-center">{{ item.name }}</div>
+                                        <div v-if="item.note" class="text-xs text-slate-400 text-center mt-2 break-words whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">{{ item.note }}</div>
+                                    </div>
+                                </div>
+                                <!-- 一般卡片 -->
+                                <div v-else class="flex h-full min-h-[80px]">
+                                    <div class="flex-1 p-4 flex flex-col justify-center select-none min-w-0">
+                                        <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">{{ item.name }}</h3>
+                                        <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded inline-block w-fit mb-1">{{ item.category }}</span>
+                                        <div v-if="item.note">
+                                            <p :class="['text-xs text-slate-400 break-words whitespace-pre-wrap', expandedItems[item.id] ? '' : 'line-clamp-2']">{{ item.note }}</p>
+                                            <button v-if="item.note.length > 40" @click.stop="toggleExpand(item.id)"
+                                                    class="text-[10px] text-ice-500 font-bold mt-1">
+                                                {{ expandedItems[item.id] ? '收起' : '展開' }}
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="mt-3 text-sm font-bold text-slate-700 text-center">{{ item.name }}</div>
-                                    <div v-if="item.note" class="text-xs text-slate-400 text-center mt-2 break-words whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">{{ item.note }}</div>
-                                </div>
-                            </div>
-                            <!-- 一般卡片 -->
-                            <div v-else class="flex h-full min-h-[80px]">
-                                <div class="flex-1 p-4 flex flex-col justify-center select-none min-w-0">
-                                    <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2">{{ item.name }}</h3>
-                                    <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded inline-block w-fit mb-1">{{ item.category }}</span>
-                                    <div v-if="item.note">
-                                        <p :class="['text-xs text-slate-400 break-words whitespace-pre-wrap', expandedItems[item.id] ? '' : 'line-clamp-2']">{{ item.note }}</p>
-                                        <button v-if="item.note.length > 40" @click.stop="toggleExpand(item.id)"
-                                                class="text-[10px] text-ice-500 font-bold mt-1">
-                                            {{ expandedItems[item.id] ? '收起' : '展開' }}
+                                    <div class="flex flex-col gap-2 p-2 border-l border-slate-50 justify-center bg-slate-50/50 flex-shrink-0">
+                                        <button @click.stop="openMap(item.name)" class="w-9 h-9 rounded-full bg-ice-100 text-ice-600 flex items-center justify-center shadow-sm hover:bg-ice-200">
+                                            <i class="fa-solid fa-location-arrow text-sm"></i>
+                                        </button>
+                                        <button @click.stop="editItem(item)" class="w-9 h-9 rounded-full bg-white text-slate-400 flex items-center justify-center shadow-sm hover:text-ice-500 border border-slate-100">
+                                            <i class="fa-solid fa-pen text-sm"></i>
                                         </button>
                                     </div>
-                                </div>
-                                <div class="flex flex-col gap-2 p-2 border-l border-slate-50 justify-center bg-slate-50/50 flex-shrink-0">
-                                    <button @click.stop="openMap(item.name)" class="w-9 h-9 rounded-full bg-ice-100 text-ice-600 flex items-center justify-center shadow-sm hover:bg-ice-200">
-                                        <i class="fa-solid fa-location-arrow text-sm"></i>
-                                    </button>
-                                    <button @click.stop="editItem(item)" class="w-9 h-9 rounded-full bg-white text-slate-400 flex items-center justify-center shadow-sm hover:text-ice-500 border border-slate-100">
-                                        <i class="fa-solid fa-pen text-sm"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div v-if="currentItinerary.length === 0" class="flex flex-col items-center justify-center py-10 text-slate-400">
-                    <i class="fa-regular fa-calendar text-2xl mb-2"></i>
-                    <p class="text-sm">尚無行程，點擊右下角新增</p>
+                    <div v-if="currentItinerary.length === 0" class="flex flex-col items-center justify-center py-10 text-slate-400">
+                        <i class="fa-regular fa-calendar text-2xl mb-2"></i>
+                        <p class="text-sm">尚無行程，點擊右下角新增</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </div><!-- end 滾動區 -->
 
-        <!-- 新增按鈕：fixed 在視窗右下 -->
+        <!-- 新增按鈕：absolute 在行程 tab 右下角 -->
         <button @click="openAddModal"
-                style="position: fixed; right: max(calc(50vw - 200px + 1.5rem), 1.5rem); bottom: calc(1.5rem + var(--safe-bottom))"
-                class="w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
+                style="bottom: calc(1.5rem + var(--safe-bottom))"
+                class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
             <i class="fa-solid fa-plus"></i>
         </button>
     </div>
 
     <!-- ===== 資訊 Tab ===== -->
-    <div v-if="currentTab === 'info'" class="content-scroll animate-fade-in bg-slate-50"
-         style="height: var(--app-height)">
+    <div v-if="currentTab === 'info'"
+         class="flex flex-col animate-fade-in"
+         style="height: 100%; overflow: hidden;">
 
-        <!-- 封面圖 -->
-        <div class="relative w-full h-[200px] flex-shrink-0">
-            <img src="Korea_trip.png"
-                 onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
-                 alt="Korea Banner" class="w-full h-full object-cover">
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-50 to-transparent"></div>
-        </div>
+        <div class="flex-1 overflow-y-auto" style="overflow-x: hidden;">
 
-        <div class="px-4 pt-2 space-y-4" style="padding-bottom: calc(4rem + var(--safe-bottom))">
-            <h2 class="text-2xl font-bold text-slate-800 ml-1">旅遊資訊</h2>
-
-            <!-- 匯率換算 -->
-            <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
-                <div class="flex items-center mb-4">
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">
-                        <i class="fa-solid fa-won-sign"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800">匯率換算</h3>
-                        <p class="text-[10px] text-slate-400">即時匯率: {{ exchangeRate }}</p>
+            <!-- 封面 + Tab Bar -->
+            <div class="relative w-full h-[220px] flex-shrink-0">
+                <img src="Korea_trip.png"
+                     onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
+                     alt="Korea Banner" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                <div class="absolute -bottom-6 left-0 right-0 px-4 z-20 flex justify-center">
+                    <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
+                        <button @click="currentTab = 'itinerary'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'itinerary' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">行程</button>
+                        <button @click="currentTab = 'info'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'info' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">資訊</button>
+                        <button @click="currentTab = 'shopping'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'shopping' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">購物</button>
+                        <button @click="currentTab = 'expenses'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'expenses' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">花費</button>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl mb-4">
-                    <div class="flex-1 min-w-0">
-                        <label class="text-[10px] text-slate-400 font-bold">₩ KRW</label>
-                        <input type="number" v-model="calcKrw"
-                               class="w-full bg-transparent text-xl font-bold text-slate-800 focus:outline-none placeholder-slate-300" placeholder="0">
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 flex-shrink-0"></i>
-                    <div class="flex-1 text-right min-w-0">
-                        <label class="text-[10px] text-slate-400 font-bold">NT$ TWD</label>
-                        <div class="text-xl font-bold text-ice-600">{{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) : 0 }}</div>
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="flex items-center gap-2">
-                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i class="fa-regular fa-credit-card"></i></div>
-                            <div>
-                                <p class="text-xs font-bold text-slate-700">刷卡預估金額</p>
-                                <p class="text-[10px] text-slate-400">含 1.5% 海外手續費</p>
-                            </div>
+            </div>
+
+            <div class="px-4 pt-4 mt-8 space-y-4" style="padding-bottom: calc(4rem + var(--safe-bottom))">
+                <h2 class="text-2xl font-bold text-slate-800 ml-1">旅遊資訊</h2>
+
+                <!-- 匯率換算 -->
+                <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">
+                            <i class="fa-solid fa-won-sign"></i>
                         </div>
-                        <a href="https://twrates.com/card/visa/usd.html" target="_blank"
-                           class="text-[10px] text-ice-500 flex items-center bg-ice-50 px-3 py-1.5 rounded-full font-bold flex-shrink-0">
-                            詳細比價 <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[8px]"></i>
-                        </a>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] text-slate-400 font-bold mb-1">預估匯率</p>
-                            <p class="text-lg font-bold text-slate-700">{{ (exchangeRate * 1.015).toFixed(3) }}</p>
-                        </div>
-                        <i class="fa-solid fa-arrow-right-long text-slate-300"></i>
-                        <div class="text-right">
-                            <p class="text-[10px] text-slate-400 font-bold mb-1">約合台幣</p>
-                            <p class="text-2xl font-black text-blue-600">
-                                {{ calcKrw ? (calcKrw * exchangeRate * 1.015).toFixed(0) : 0 }}
-                                <span class="text-xs font-bold text-slate-400">TWD</span>
-                            </p>
+                            <h3 class="font-bold text-slate-800">匯率換算</h3>
+                            <p class="text-[10px] text-slate-400">即時匯率: {{ exchangeRate }}</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- 住宿飯店 -->
-            <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
-                <div class="flex items-center gap-2 mb-3">
-                    <h3 class="font-bold text-slate-800">住宿飯店</h3>
-                    <button @click="showHotelModal = true"
-                            class="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 hover:text-white transition-all shadow-sm">
-                        <i class="fa-solid fa-plus text-[10px]"></i>
-                    </button>
-                </div>
-                <div class="space-y-3">
-                    <div v-for="hotel in hotelList" :key="hotel.id" class="border border-slate-100 rounded-2xl p-3">
-                        <div class="flex items-center mb-2">
-                            <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mr-3 text-xs flex-shrink-0">
-                                <i class="fa-solid fa-bed"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-base text-slate-800 truncate">{{ hotel.name }}</h4>
-                                <p class="text-xs text-slate-400 truncate">{{ hotel.address }}</p>
-                            </div>
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl mb-4">
+                        <div class="flex-1 min-w-0">
+                            <label class="text-[10px] text-slate-400 font-bold">₩ KRW</label>
+                            <input type="number" v-model="calcKrw"
+                                   class="w-full bg-transparent text-xl font-bold text-slate-800 focus:outline-none placeholder-slate-300" placeholder="0">
                         </div>
-                        <div class="flex gap-2">
-                            <button @click="openMap(hotel.address + ' ' + hotel.name)"
-                                    class="flex-1 bg-slate-800 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 active:scale-95">
-                                <i class="fa-solid fa-location-dot"></i> 導航
-                            </button>
-                            <a :href="'tel:' + hotel.phone" class="w-9 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center">
-                                <i class="fa-solid fa-phone text-xs"></i>
+                        <i class="fa-solid fa-arrow-right text-slate-300 flex-shrink-0"></i>
+                        <div class="flex-1 text-right min-w-0">
+                            <label class="text-[10px] text-slate-400 font-bold">NT$ TWD</label>
+                            <div class="text-xl font-bold text-ice-600">{{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) : 0 }}</div>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-100 pt-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i class="fa-regular fa-credit-card"></i></div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-700">刷卡預估金額</p>
+                                    <p class="text-[10px] text-slate-400">含 1.5% 海外手續費</p>
+                                </div>
+                            </div>
+                            <a href="https://twrates.com/card/visa/usd.html" target="_blank"
+                               class="text-[10px] text-ice-500 flex items-center bg-ice-50 px-3 py-1.5 rounded-full font-bold flex-shrink-0">
+                                詳細比價 <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[8px]"></i>
                             </a>
-                            <button @click="deleteHotel(hotel.id)" class="w-9 bg-red-50 text-red-400 rounded-xl flex items-center justify-center">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-bold mb-1">預估匯率</p>
+                                <p class="text-lg font-bold text-slate-700">{{ (exchangeRate * 1.015).toFixed(3) }}</p>
+                            </div>
+                            <i class="fa-solid fa-arrow-right-long text-slate-300"></i>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-400 font-bold mb-1">約合台幣</p>
+                                <p class="text-2xl font-black text-blue-600">
+                                    {{ calcKrw ? (calcKrw * exchangeRate * 1.015).toFixed(0) : 0 }}
+                                    <span class="text-xs font-bold text-slate-400">TWD</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <div v-if="hotelList.length === 0" class="py-8 flex flex-col items-center text-slate-300">
-                        <i class="fa-solid fa-hotel text-3xl mb-2"></i>
-                        <p class="text-xs">尚未新增飯店</p>
-                    </div>
                 </div>
-            </div>
 
-            <!-- 行程備份 -->
-            <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
-                <div class="flex items-center mb-3">
-                    <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mr-3">
-                        <i class="fa-solid fa-floppy-disk"></i>
+                <!-- 住宿飯店 -->
+                <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <h3 class="font-bold text-slate-800">住宿飯店</h3>
+                        <button @click="showHotelModal = true"
+                                class="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 hover:text-white transition-all shadow-sm">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                        </button>
                     </div>
-                    <h3 class="font-bold text-slate-800">行程分享與備份</h3>
+                    <div class="space-y-3">
+                        <div v-for="hotel in hotelList" :key="hotel.id" class="border border-slate-100 rounded-2xl p-3">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mr-3 text-xs flex-shrink-0">
+                                    <i class="fa-solid fa-bed"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-base text-slate-800 truncate">{{ hotel.name }}</h4>
+                                    <p class="text-xs text-slate-400 truncate">{{ hotel.address }}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button @click="openMap(hotel.address + ' ' + hotel.name)"
+                                        class="flex-1 bg-slate-800 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 active:scale-95">
+                                    <i class="fa-solid fa-location-dot"></i> 導航
+                                </button>
+                                <a :href="'tel:' + hotel.phone" class="w-9 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                </a>
+                                <button @click="deleteHotel(hotel.id)" class="w-9 bg-red-50 text-red-400 rounded-xl flex items-center justify-center">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div v-if="hotelList.length === 0" class="py-8 flex flex-col items-center text-slate-300">
+                            <i class="fa-solid fa-hotel text-3xl mb-2"></i>
+                            <p class="text-xs">尚未新增飯店</p>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-400 mb-4 leading-relaxed">目前資料僅存在此裝置。匯出後傳給同行者，請他們匯入即可同步。</p>
-                <div class="flex gap-3">
-                    <button @click="exportData" class="flex-1 bg-ice-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-export"></i> 匯出
-                    </button>
-                    <label class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-file-import"></i> 匯入
-                        <input type="file" @change="importData" class="hidden" accept=".json">
-                    </label>
+
+                <!-- 行程備份 -->
+                <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mr-3">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">行程分享與備份</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">目前資料僅存在此裝置。匯出後傳給同行者，請他們匯入即可同步。</p>
+                    <div class="flex gap-3">
+                        <button @click="exportData" class="flex-1 bg-ice-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-export"></i> 匯出
+                        </button>
+                        <label class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-file-import"></i> 匯入
+                            <input type="file" @change="importData" class="hidden" accept=".json">
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ===== 購物 Tab ===== -->
-    <div v-if="currentTab === 'shopping'" class="content-scroll animate-fade-in bg-slate-50"
-         style="height: var(--app-height)">
+    <div v-if="currentTab === 'shopping'"
+         class="flex flex-col animate-fade-in"
+         style="height: 100%; overflow: hidden;">
 
-        <!-- 封面圖 -->
-        <div class="relative w-full h-[200px] flex-shrink-0">
-            <img src="Korea_trip.png"
-                 onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
-                 alt="Korea Banner" class="w-full h-full object-cover">
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-50 to-transparent"></div>
-        </div>
+        <div class="flex-1 overflow-y-auto" style="overflow-x: hidden;">
 
-        <div class="px-4 pt-2" style="padding-bottom: calc(4rem + var(--safe-bottom))">
-            <h2 class="text-2xl font-bold text-slate-800 mb-4 ml-1">購物清單</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <div v-for="(item, idx) in shoppingList" :key="idx"
-                     class="bg-white p-3 rounded-2xl shadow-soft border border-slate-100 relative group overflow-hidden">
-                    <div class="aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden relative">
-                        <img v-if="item.image" :src="item.image" class="w-full h-full object-cover">
-                        <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
-                            <i class="fa-solid fa-image text-3xl"></i>
-                        </div>
-                        <button @click.stop="removeShoppingItem(idx)"
-                                class="absolute top-2 right-2 w-7 h-7 bg-white/90 text-red-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 z-10">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                        <button @click.stop="openShopModal(item, idx)"
-                                class="absolute bottom-2 right-2 w-7 h-7 bg-white/90 text-ice-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 z-10">
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
+            <!-- 封面 + Tab Bar -->
+            <div class="relative w-full h-[220px] flex-shrink-0">
+                <img src="Korea_trip.png"
+                     onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
+                     alt="Korea Banner" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                <div class="absolute -bottom-6 left-0 right-0 px-4 z-20 flex justify-center">
+                    <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
+                        <button @click="currentTab = 'itinerary'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'itinerary' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">行程</button>
+                        <button @click="currentTab = 'info'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'info' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">資訊</button>
+                        <button @click="currentTab = 'shopping'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'shopping' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">購物</button>
+                        <button @click="currentTab = 'expenses'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'expenses' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">花費</button>
                     </div>
-                    <h4 class="font-bold text-slate-800 text-sm truncate">{{ item.name }}</h4>
                 </div>
-                <div @click="openShopModal()"
-                     class="border-2 border-dashed border-ice-200 rounded-2xl flex flex-col items-center justify-center aspect-square cursor-pointer text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-colors">
-                    <i class="fa-solid fa-camera mb-2 text-2xl"></i>
-                    <span class="text-xs font-bold">新增物品</span>
+            </div>
+
+            <div class="px-4 pt-4 mt-8" style="padding-bottom: calc(4rem + var(--safe-bottom))">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 ml-1">購物清單</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div v-for="(item, idx) in shoppingList" :key="idx"
+                         class="bg-white p-3 rounded-2xl shadow-soft border border-slate-100 relative group overflow-hidden">
+                        <div class="aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden relative">
+                            <img v-if="item.image" :src="item.image" class="w-full h-full object-cover">
+                            <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
+                                <i class="fa-solid fa-image text-3xl"></i>
+                            </div>
+                            <button @click.stop="removeShoppingItem(idx)"
+                                    class="absolute top-2 right-2 w-7 h-7 bg-white/90 text-red-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 z-10">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <button @click.stop="openShopModal(item, idx)"
+                                    class="absolute bottom-2 right-2 w-7 h-7 bg-white/90 text-ice-500 rounded-full shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 z-10">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm truncate">{{ item.name }}</h4>
+                    </div>
+                    <div @click="openShopModal()"
+                         class="border-2 border-dashed border-ice-200 rounded-2xl flex flex-col items-center justify-center aspect-square cursor-pointer text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-colors">
+                        <i class="fa-solid fa-camera mb-2 text-2xl"></i>
+                        <span class="text-xs font-bold">新增物品</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ===== 花費 Tab ===== -->
-    <div v-if="currentTab === 'expenses'" class="content-scroll animate-fade-in bg-slate-50 relative"
-         style="height: var(--app-height)">
+    <div v-if="currentTab === 'expenses'"
+         class="flex flex-col animate-fade-in relative"
+         style="height: 100%; overflow: hidden;">
 
-        <!-- 封面圖 -->
-        <div class="relative w-full h-[200px] flex-shrink-0">
-            <img src="Korea_trip.png"
-                 onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
-                 alt="Korea Banner" class="w-full h-full object-cover">
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-50 to-transparent"></div>
-        </div>
+        <div class="flex-1 overflow-y-auto" style="overflow-x: hidden;">
 
-        <!-- 統計區（sticky） -->
-        <div class="sticky top-0 z-10 bg-white shadow-soft">
-            <div class="p-4 pb-3">
-                <p class="text-slate-400 text-xs font-bold tracking-wider uppercase mb-2">Total Expenses</p>
-                <div class="flex justify-between items-end mb-3 border-b border-slate-100 pb-3">
-                    <div>
-                        <div class="flex items-baseline">
-                            <span class="text-xl font-bold text-slate-800 mr-1">₩</span>
-                            <h2 class="text-4xl font-black text-slate-800 tracking-tighter">{{ expensesStats.krw.toLocaleString() }}</h2>
-                        </div>
-                        <p class="text-[10px] text-slate-400">韓幣總計</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="flex items-baseline justify-end text-ice-600">
-                            <span class="text-sm font-bold mr-1">NT$</span>
-                            <h3 class="text-2xl font-black tracking-tight">{{ expensesStats.twd.toLocaleString() }}</h3>
-                        </div>
-                        <p class="text-[10px] text-ice-400">台幣總計 (約)</p>
+            <!-- 封面 + Tab Bar -->
+            <div class="relative w-full h-[220px] flex-shrink-0">
+                <img src="Korea_trip.png"
+                     onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'"
+                     alt="Korea Banner" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                <div class="absolute -bottom-6 left-0 right-0 px-4 z-20 flex justify-center">
+                    <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg flex space-x-1 border border-white/50">
+                        <button @click="currentTab = 'itinerary'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'itinerary' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">行程</button>
+                        <button @click="currentTab = 'info'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'info' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">資訊</button>
+                        <button @click="currentTab = 'shopping'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'shopping' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">購物</button>
+                        <button @click="currentTab = 'expenses'" :class="['px-4 py-2 rounded-full text-sm font-bold transition-all', currentTab === 'expenses' ? 'bg-ice-500 text-white shadow-md' : 'text-slate-400']">花費</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- 分帳結算 -->
-                <div class="bg-slate-50 rounded-2xl p-3 mb-3 border border-slate-100">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-slate-600">
-                            <i class="fa-solid fa-scale-balanced mr-1 text-ice-500"></i>分帳結算
-                        </span>
-                        <button @click="editingSplitNames = !editingSplitNames"
-                                class="text-[10px] text-slate-400 flex items-center gap-1 hover:text-ice-500 flex-shrink-0">
-                            <i class="fa-solid fa-pen text-[9px]"></i> 編輯名稱
-                        </button>
+            <!-- 花費統計：sticky，往上捲後黏在頂部 -->
+            <div class="sticky top-0 z-10 bg-white shadow-soft mt-8">
+                <div class="p-4 pb-3">
+                    <p class="text-slate-400 text-xs font-bold tracking-wider uppercase mb-2">Total Expenses</p>
+                    <div class="flex justify-between items-end mb-3 border-b border-slate-100 pb-3">
+                        <div>
+                            <div class="flex items-baseline">
+                                <span class="text-xl font-bold text-slate-800 mr-1">₩</span>
+                                <h2 class="text-4xl font-black text-slate-800 tracking-tighter">{{ expensesStats.krw.toLocaleString() }}</h2>
+                            </div>
+                            <p class="text-[10px] text-slate-400">韓幣總計</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-baseline justify-end text-ice-600">
+                                <span class="text-sm font-bold mr-1">NT$</span>
+                                <h3 class="text-2xl font-black tracking-tight">{{ expensesStats.twd.toLocaleString() }}</h3>
+                            </div>
+                            <p class="text-[10px] text-ice-400">台幣總計 (約)</p>
+                        </div>
                     </div>
-                    <!-- 分帳名字編輯：改用 block 堆疊避免溢出 -->
-                    <div v-if="editingSplitNames" class="flex gap-2 mb-2 w-full">
-                        <input v-model="splitSettings.person1"
-                               class="flex-1 min-w-0 bg-white p-2 rounded-xl text-xs font-bold outline-none border border-slate-200 text-center w-0">
-                        <input v-model="splitSettings.person2"
-                               class="flex-1 min-w-0 bg-white p-2 rounded-xl text-xs font-bold outline-none border border-slate-200 text-center w-0">
+
+                    <!-- 分帳結算 -->
+                    <div class="bg-slate-50 rounded-2xl p-3 mb-3 border border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-600">
+                                <i class="fa-solid fa-scale-balanced mr-1 text-ice-500"></i>分帳結算
+                            </span>
+                            <button @click="editingSplitNames = !editingSplitNames"
+                                    class="text-[10px] text-slate-400 flex items-center gap-1 hover:text-ice-500 flex-shrink-0">
+                                <i class="fa-solid fa-pen text-[9px]"></i> 編輯名稱
+                            </button>
+                        </div>
+                        <div v-if="editingSplitNames" class="flex gap-2 mb-2 w-full">
+                            <input v-model="splitSettings.person1"
+                                   class="flex-1 min-w-0 w-0 bg-white p-2 rounded-xl text-xs font-bold outline-none border border-slate-200 text-center">
+                            <input v-model="splitSettings.person2"
+                                   class="flex-1 min-w-0 w-0 bg-white p-2 rounded-xl text-xs font-bold outline-none border border-slate-200 text-center">
+                        </div>
+                        <p class="text-[10px] font-bold text-ice-600 mb-2">{{ splitStats.settlement }}</p>
+                        <div class="flex gap-2">
+                            <div class="flex-1 min-w-0 bg-white rounded-xl p-2 text-center border border-slate-100">
+                                <p class="text-[10px] text-slate-400 font-bold truncate">{{ splitSettings.person1 }}</p>
+                                <p class="text-sm font-black text-slate-800">NT${{ splitStats.p1Total.toLocaleString() }}</p>
+                            </div>
+                            <div class="flex-1 min-w-0 bg-white rounded-xl p-2 text-center border border-slate-100">
+                                <p class="text-[10px] text-slate-400 font-bold truncate">{{ splitSettings.person2 }}</p>
+                                <p class="text-sm font-black text-slate-800">NT${{ splitStats.p2Total.toLocaleString() }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-[10px] font-bold text-ice-600 mb-2">{{ splitStats.settlement }}</p>
+
+                    <!-- 信用卡回饋 -->
                     <div class="flex gap-2">
-                        <div class="flex-1 min-w-0 bg-white rounded-xl p-2 text-center border border-slate-100">
-                            <p class="text-[10px] text-slate-400 font-bold truncate">{{ splitSettings.person1 }}</p>
-                            <p class="text-sm font-black text-slate-800">NT${{ splitStats.p1Total.toLocaleString() }}</p>
-                        </div>
-                        <div class="flex-1 min-w-0 bg-white rounded-xl p-2 text-center border border-slate-100">
-                            <p class="text-[10px] text-slate-400 font-bold truncate">{{ splitSettings.person2 }}</p>
-                            <p class="text-sm font-black text-slate-800">NT${{ splitStats.p2Total.toLocaleString() }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 信用卡回饋 -->
-                <div class="flex gap-2">
-                    <div class="flex-1 min-w-0 bg-white border border-slate-200 rounded-2xl p-3 relative overflow-hidden shadow-sm">
-                        <div class="absolute -right-3 -top-3 w-16 h-16 bg-slate-50 rounded-full"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center gap-1 mb-1">
-                                <i class="fa-regular fa-credit-card text-slate-600 text-xs"></i>
-                                <span class="text-[10px] font-bold text-slate-600">玉山 Unicard</span>
+                        <div class="flex-1 min-w-0 bg-white border border-slate-200 rounded-2xl p-3 relative overflow-hidden shadow-sm">
+                            <div class="absolute -right-3 -top-3 w-16 h-16 bg-slate-50 rounded-full"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-1 mb-1">
+                                    <i class="fa-regular fa-credit-card text-slate-600 text-xs"></i>
+                                    <span class="text-[10px] font-bold text-slate-600">玉山 Unicard</span>
+                                </div>
+                                <div class="text-[9px] text-slate-400 mb-1">海外 4.5%</div>
+                                <div class="text-[10px] text-slate-500">已刷 NT${{ esunStats.spent.toLocaleString() }}</div>
+                                <div class="text-base font-black text-slate-800">+{{ esunStats.reward.toLocaleString() }}<span class="text-[10px] text-slate-400"> 點</span></div>
                             </div>
-                            <div class="text-[9px] text-slate-400 mb-1">海外 4.5%</div>
-                            <div class="text-[10px] text-slate-500">已刷 NT${{ esunStats.spent.toLocaleString() }}</div>
-                            <div class="text-base font-black text-slate-800">+{{ esunStats.reward.toLocaleString() }}<span class="text-[10px] text-slate-400"> 點</span></div>
                         </div>
-                    </div>
-                    <div class="flex-1 min-w-0 bg-slate-800 rounded-2xl p-3 relative overflow-hidden shadow-sm">
-                        <div class="absolute -right-3 -top-3 w-16 h-16 bg-white/10 rounded-full"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center gap-1 mb-1">
-                                <i class="fa-regular fa-credit-card text-slate-300 text-xs"></i>
-                                <span class="text-[10px] font-bold text-slate-300">中信 LinePay</span>
+                        <div class="flex-1 min-w-0 bg-slate-800 rounded-2xl p-3 relative overflow-hidden shadow-sm">
+                            <div class="absolute -right-3 -top-3 w-16 h-16 bg-white/10 rounded-full"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-1 mb-1">
+                                    <i class="fa-regular fa-credit-card text-slate-300 text-xs"></i>
+                                    <span class="text-[10px] font-bold text-slate-300">中信 LinePay</span>
+                                </div>
+                                <div class="text-[9px] text-slate-400 mb-1">一般 2.8% / 特殊 10%</div>
+                                <div class="text-[10px] text-slate-400">已刷 NT${{ ctbcStats.spent.toLocaleString() }}</div>
+                                <div class="text-base font-black text-white">+{{ ctbcStats.reward.toLocaleString() }}<span class="text-[10px] text-slate-400"> 點</span></div>
                             </div>
-                            <div class="text-[9px] text-slate-400 mb-1">一般 2.8% / 特殊 10%</div>
-                            <div class="text-[10px] text-slate-400">已刷 NT${{ ctbcStats.spent.toLocaleString() }}</div>
-                            <div class="text-base font-black text-white">+{{ ctbcStats.reward.toLocaleString() }}<span class="text-[10px] text-slate-400"> 點</span></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 花費清單 -->
-        <div class="px-4 pt-3 space-y-3" style="padding-bottom: calc(6rem + var(--safe-bottom))">
-            <div v-for="exp in expenses" :key="exp.id"
-                 @click="openExpenseModal(exp)"
-                 class="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center justify-between active:scale-95 transition-transform cursor-pointer">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0',
-                        exp.payment === '玉山Unicard' ? 'bg-slate-100 text-slate-600' :
-                        exp.payment === '中信LinePay' ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-500']">
-                        <i :class="getCategoryIcon(exp.category)"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <h4 class="font-bold text-sm text-slate-800 truncate">{{ exp.name }}</h4>
-                        <div class="flex items-center gap-1 flex-wrap">
-                            <p class="text-[10px] text-slate-400">{{ exp.date }}</p>
-                            <span v-if="exp.payment === '玉山Unicard'" class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">玉山</span>
-                            <span v-else-if="exp.payment === '中信LinePay'" class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded">中信</span>
-                            <span v-else class="text-[9px] bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded">{{ exp.payment }}</span>
-                            <span v-if="exp.splitEnabled" class="text-[9px] bg-ice-50 text-ice-600 px-1.5 py-0.5 rounded border border-ice-100">分帳</span>
+            <!-- 花費清單 -->
+            <div class="px-4 pt-3 space-y-3" style="padding-bottom: calc(6rem + var(--safe-bottom))">
+                <div v-for="exp in expenses" :key="exp.id"
+                     @click="openExpenseModal(exp)"
+                     class="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center justify-between active:scale-95 transition-transform cursor-pointer">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0',
+                            exp.payment === '玉山Unicard' ? 'bg-slate-100 text-slate-600' :
+                            exp.payment === '中信LinePay' ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-500']">
+                            <i :class="getCategoryIcon(exp.category)"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-sm text-slate-800 truncate">{{ exp.name }}</h4>
+                            <div class="flex items-center gap-1 flex-wrap">
+                                <p class="text-[10px] text-slate-400">{{ exp.date }}</p>
+                                <span v-if="exp.payment === '玉山Unicard'" class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">玉山</span>
+                                <span v-else-if="exp.payment === '中信LinePay'" class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded">中信</span>
+                                <span v-else class="text-[9px] bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded">{{ exp.payment }}</span>
+                                <span v-if="exp.splitEnabled" class="text-[9px] bg-ice-50 text-ice-600 px-1.5 py-0.5 rounded border border-ice-100">分帳</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="text-right flex-shrink-0 ml-2">
+                        <span class="block font-bold text-slate-700 text-base">
+                            {{ exp.currency === 'TWD' ? 'NT$' : '₩' }}{{ parseInt(exp.amount).toLocaleString() }}
+                        </span>
+                        <span v-if="exp.currency === 'TWD'" class="text-[10px] text-slate-400 block">(約 ₩{{ (exp.amount / exchangeRate).toFixed(0) }})</span>
+                        <span v-else class="text-[10px] text-slate-400 block">(約 NT${{ (exp.amount * exchangeRate).toFixed(0) }})</span>
+                    </div>
                 </div>
-                <div class="text-right flex-shrink-0 ml-2">
-                    <span class="block font-bold text-slate-700 text-base">
-                        {{ exp.currency === 'TWD' ? 'NT$' : '₩' }}{{ parseInt(exp.amount).toLocaleString() }}
-                    </span>
-                    <span v-if="exp.currency === 'TWD'" class="text-[10px] text-slate-400 block">(約 ₩{{ (exp.amount / exchangeRate).toFixed(0) }})</span>
-                    <span v-else class="text-[10px] text-slate-400 block">(約 NT${{ (exp.amount * exchangeRate).toFixed(0) }})</span>
+                <div v-if="expenses.length === 0" class="text-center py-10 text-slate-400">
+                    <p class="text-sm">尚無消費紀錄</p>
                 </div>
-            </div>
-            <div v-if="expenses.length === 0" class="text-center py-10 text-slate-400">
-                <p class="text-sm">尚無消費紀錄</p>
             </div>
         </div>
 
         <!-- 新增按鈕 -->
         <button @click="openExpenseModal()"
-                style="position: fixed; right: max(calc(50vw - 200px + 1.5rem), 1.5rem); bottom: calc(1.5rem + var(--safe-bottom))"
-                class="w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
+                style="bottom: calc(1.5rem + var(--safe-bottom))"
+                class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
             <i class="fa-solid fa-plus"></i>
         </button>
     </div>
@@ -550,7 +581,6 @@
                                class="w-full bg-slate-50 p-4 rounded-xl text-sm border-0 font-bold text-slate-700 outline-none">
                     </div>
                 </div>
-
                 <!-- 航班欄位 -->
                 <div v-if="form.category === '航班'" class="bg-ice-50 p-4 rounded-2xl space-y-3 border border-ice-100">
                     <p class="text-xs font-bold text-ice-600"><i class="fa-solid fa-plane mr-1"></i>航班資訊</p>
@@ -600,7 +630,6 @@
                                class="w-full bg-white p-3 rounded-xl text-sm font-bold text-slate-700 outline-none border border-ice-100 text-center uppercase">
                     </div>
                 </div>
-
                 <!-- 非航班交通方式 -->
                 <div v-if="form.category !== '航班'">
                     <label class="text-xs font-bold text-slate-400 ml-1 mb-2 block">交通方式</label>
@@ -619,7 +648,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div>
                     <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">備註</label>
                     <textarea v-model="form.note" placeholder="備註 / 門票資訊"
@@ -700,7 +728,6 @@
                         </button>
                     </div>
                 </div>
-                <!-- 分帳 -->
                 <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-scale-balanced mr-1 text-ice-500"></i>分帳</span>
