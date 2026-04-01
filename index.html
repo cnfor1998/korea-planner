@@ -36,7 +36,6 @@
     <!-- ===== 行程 Tab ===== -->
     <div v-if="currentTab === 'itinerary'" class="flex flex-col animate-fade-in relative" style="height:100%;overflow:hidden;">
         <div class="flex-1 overflow-y-auto" style="overflow-x:hidden;">
-            <!-- 封面 + Tab Bar -->
             <div class="relative w-full h-[220px] flex-shrink-0">
                 <img src="Korea_trip.png" onerror="this.src='https://images.unsplash.com/photo-1590559899731-a363c77c56dc?q=80&w=2672&auto=format&fit=crop'" alt="Korea Banner" class="w-full h-full object-cover">
                 <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
@@ -78,7 +77,8 @@
             <div class="px-4 pt-2" style="padding-bottom:calc(6rem + var(--safe-bottom))">
                 <!-- 天氣 -->
                 <div class="h-[80px] overflow-y-auto snap-y snap-mandatory no-scrollbar mb-4">
-                    <div v-for="w in weatherList" :key="w.city" class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
+                    <div v-for="w in weatherList" :key="w.city"
+                         class="h-[80px] snap-start bg-gradient-to-r from-ice-50 to-white border border-ice-100 rounded-2xl px-4 py-3 shadow-sm flex items-center justify-between relative overflow-hidden shrink-0 mb-2">
                         <div class="absolute -right-1 -top-4 text-ice-50 opacity-60 text-6xl rotate-12 pointer-events-none"><i :class="w.icon"></i></div>
                         <div class="z-10 flex items-center gap-3">
                             <i :class="w.icon" class="text-2xl text-ice-500"></i>
@@ -96,7 +96,8 @@
                 <!-- 時間軸 -->
                 <div class="relative pl-2">
                     <div class="absolute left-[29px] top-4 bottom-0 w-0.5 dashed-line z-0"></div>
-                    <div v-for="(item,index) in currentItinerary" :key="item.id" class="relative flex gap-4 mb-8 group"
+                    <div v-for="(item,index) in currentItinerary" :key="item.id"
+                         class="relative flex gap-4 mb-8 group"
                          draggable="true" @dragstart="dragStart(index)" @dragover.prevent @drop="drop(index)">
                         <div class="flex flex-col items-center z-10 flex-shrink-0 w-14">
                             <div class="w-12 h-12 rounded-full bg-ice-500 text-white flex items-center justify-center shadow-lg border-4 border-slate-50 transform transition-transform group-hover:scale-110">
@@ -163,7 +164,8 @@
                 </div>
             </div>
         </div>
-        <button @click="openAddModal" style="bottom:calc(1.5rem + var(--safe-bottom))" class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
+        <button @click="openAddModal" style="bottom:calc(1.5rem + var(--safe-bottom))"
+                class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all hover:scale-110 active:scale-95 z-30">
             <i class="fa-solid fa-plus"></i>
         </button>
     </div>
@@ -185,49 +187,127 @@
             </div>
             <div class="px-4 pt-4 mt-8 space-y-4" style="padding-bottom:calc(4rem + var(--safe-bottom))">
                 <h2 class="text-2xl font-bold text-slate-800 ml-1">旅遊資訊</h2>
-                <!-- 匯率換算 -->
+
+                <!-- 匯率換算 + 刷卡回饋試算 -->
                 <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
                     <div class="flex items-center mb-4">
                         <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3"><i class="fa-solid fa-won-sign"></i></div>
-                        <div><h3 class="font-bold text-slate-800">匯率換算</h3><p class="text-[10px] text-slate-400">即時匯率: {{ exchangeRate }}</p></div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">匯率換算</h3>
+                            <p class="text-[10px] text-slate-400">即時匯率: {{ exchangeRate }}</p>
+                        </div>
                     </div>
+
+                    <!-- KRW → TWD -->
                     <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl mb-4">
                         <div class="flex-1 min-w-0">
                             <label class="text-[10px] text-slate-400 font-bold">₩ KRW</label>
-                            <input type="number" v-model="calcKrw" class="w-full bg-transparent text-xl font-bold text-slate-800 focus:outline-none placeholder-slate-300" placeholder="0">
+                            <input type="number" v-model="calcKrw"
+                                   class="w-full bg-transparent text-xl font-bold text-slate-800 focus:outline-none placeholder-slate-300" placeholder="0">
                         </div>
                         <i class="fa-solid fa-arrow-right text-slate-300 flex-shrink-0"></i>
                         <div class="flex-1 text-right min-w-0">
                             <label class="text-[10px] text-slate-400 font-bold">NT$ TWD</label>
-                            <div class="text-xl font-bold text-ice-600">{{ calcKrw?(calcKrw*exchangeRate).toFixed(0):0 }}</div>
+                            <div class="text-xl font-bold text-ice-600">{{ calcKrw ? (calcKrw * exchangeRate).toFixed(0) : 0 }}</div>
                         </div>
                     </div>
+
+                    <!-- 刷卡回饋試算 -->
                     <div class="border-t border-slate-100 pt-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i class="fa-regular fa-credit-card"></i></div>
-                                <div><p class="text-xs font-bold text-slate-700">刷卡預估金額</p><p class="text-[10px] text-slate-400">含 1.5% 海外手續費</p></div>
+                        <p class="text-xs font-bold text-slate-600 mb-3">
+                            <i class="fa-regular fa-credit-card mr-1 text-ice-500"></i>刷卡回饋試算
+                            <span class="text-[10px] font-normal text-slate-400 ml-1">含 1.5% 手續費</span>
+                        </p>
+
+                        <!-- 卡片選擇 2x2 -->
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button @click="calcCardMode='esun'"
+                                    :class="['py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-left',
+                                             calcCardMode==='esun'?'bg-slate-800 text-white border-slate-800':'bg-white text-slate-500 border-slate-200']">
+                                <div class="flex items-center gap-1.5 mb-0.5">
+                                    <i class="fa-regular fa-credit-card text-xs"></i>
+                                    <span>玉山 Unicard</span>
+                                </div>
+                                <div :class="['text-[10px]', calcCardMode==='esun'?'text-slate-300':'text-slate-400']">4.5% 回饋</div>
+                            </button>
+                            <button @click="calcCardMode='ctbc_general'"
+                                    :class="['py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-left',
+                                             calcCardMode==='ctbc_general'?'bg-slate-800 text-white border-slate-800':'bg-white text-slate-500 border-slate-200']">
+                                <div class="flex items-center gap-1.5 mb-0.5">
+                                    <i class="fa-regular fa-credit-card text-xs"></i>
+                                    <span>中信 一般</span>
+                                </div>
+                                <div :class="['text-[10px]', calcCardMode==='ctbc_general'?'text-slate-300':'text-slate-400']">2.8% 回饋</div>
+                            </button>
+                            <button @click="calcCardMode='ctbc_special'"
+                                    :class="['py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-left',
+                                             calcCardMode==='ctbc_special'?'bg-slate-800 text-white border-slate-800':'bg-white text-slate-500 border-slate-200']">
+                                <div class="flex items-center gap-1.5 mb-0.5">
+                                    <i class="fa-regular fa-credit-card text-xs"></i>
+                                    <span>中信 特殊通路</span>
+                                </div>
+                                <div :class="['text-[10px]', calcCardMode==='ctbc_special'?'text-slate-300':'text-slate-400']">10% 回饋</div>
+                            </button>
+                            <button @click="calcCardMode='custom'"
+                                    :class="['py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-left',
+                                             calcCardMode==='custom'?'bg-ice-500 text-white border-ice-500':'bg-white text-slate-500 border-slate-200']">
+                                <div class="flex items-center gap-1.5 mb-0.5">
+                                    <i class="fa-solid fa-sliders text-xs"></i>
+                                    <span>自訂%數</span>
+                                </div>
+                                <div :class="['text-[10px]', calcCardMode==='custom'?'text-ice-100':'text-slate-400']">自行輸入</div>
+                            </button>
+                        </div>
+
+                        <!-- 自訂輸入 -->
+                        <div v-if="calcCardMode==='custom'" class="flex items-center gap-3 bg-ice-50 p-3 rounded-xl mb-3 border border-ice-100">
+                            <label class="text-xs font-bold text-ice-600 flex-shrink-0">回饋%數</label>
+                            <input type="number" v-model.number="calcCustomRate" min="0" max="100" step="0.1"
+                                   class="flex-1 min-w-0 bg-white p-2 rounded-lg text-sm font-bold text-slate-700 outline-none border border-ice-200 text-center">
+                            <span class="text-sm font-bold text-ice-600 flex-shrink-0">%</span>
+                        </div>
+
+                        <!-- 結果 -->
+                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 font-bold mb-0.5">刷卡金額（含手續費）</p>
+                                    <p class="text-xl font-black text-slate-800">NT$ {{ calcCardAmount.toLocaleString() }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] text-slate-400 font-bold mb-0.5">預估回饋</p>
+                                    <p class="text-xl font-black text-green-500">+ {{ calcReward.toLocaleString() }}<span class="text-xs font-bold text-slate-400"> 點</span></p>
+                                </div>
                             </div>
-                            <a href="https://twrates.com/card/visa/usd.html" target="_blank" class="text-[10px] text-ice-500 flex items-center bg-ice-50 px-3 py-1.5 rounded-full font-bold flex-shrink-0">詳細比價 <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[8px]"></i></a>
+                            <div class="border-t border-slate-200 pt-3 flex items-center justify-between">
+                                <p class="text-[10px] text-slate-400 font-bold">扣除回饋後實際負擔</p>
+                                <p class="text-base font-black text-ice-600">NT$ {{ Math.max(0, calcCardAmount - calcReward).toLocaleString() }}</p>
+                            </div>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
-                            <div><p class="text-[10px] text-slate-400 font-bold mb-1">預估匯率</p><p class="text-lg font-bold text-slate-700">{{ (exchangeRate*1.015).toFixed(3) }}</p></div>
-                            <i class="fa-solid fa-arrow-right-long text-slate-300"></i>
-                            <div class="text-right"><p class="text-[10px] text-slate-400 font-bold mb-1">約合台幣</p><p class="text-2xl font-black text-blue-600">{{ calcKrw?(calcKrw*exchangeRate*1.015).toFixed(0):0 }}<span class="text-xs font-bold text-slate-400"> TWD</span></p></div>
-                        </div>
+
+                        <a href="https://twrates.com/card/visa/usd.html" target="_blank"
+                           class="mt-3 text-[10px] text-ice-500 flex items-center justify-center bg-ice-50 py-2 rounded-xl font-bold hover:bg-ice-100 transition-colors">
+                            詳細比價 <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[8px]"></i>
+                        </a>
                     </div>
                 </div>
+
                 <!-- 住宿飯店 -->
                 <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
                     <div class="flex items-center gap-2 mb-3">
                         <h3 class="font-bold text-slate-800">住宿飯店</h3>
-                        <button @click="showHotelModal=true" class="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 hover:text-white transition-all shadow-sm"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                        <button @click="showHotelModal=true" class="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 hover:text-white transition-all shadow-sm">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                        </button>
                     </div>
                     <div class="space-y-3">
                         <div v-for="hotel in hotelList" :key="hotel.id" class="border border-slate-100 rounded-2xl p-3">
                             <div class="flex items-center mb-2">
                                 <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mr-3 text-xs flex-shrink-0"><i class="fa-solid fa-bed"></i></div>
-                                <div class="flex-1 min-w-0"><h4 class="font-bold text-base text-slate-800 truncate">{{ hotel.name }}</h4><p class="text-xs text-slate-400 truncate">{{ hotel.address }}</p></div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-base text-slate-800 truncate">{{ hotel.name }}</h4>
+                                    <p class="text-xs text-slate-400 truncate">{{ hotel.address }}</p>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 <button @click="openMap(hotel.address+' '+hotel.name)" class="flex-1 bg-slate-800 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 active:scale-95"><i class="fa-solid fa-location-dot"></i> 導航</button>
@@ -235,10 +315,14 @@
                                 <button @click="deleteHotel(hotel.id)" class="w-9 bg-red-50 text-red-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
                             </div>
                         </div>
-                        <div v-if="hotelList.length===0" class="py-8 flex flex-col items-center text-slate-300"><i class="fa-solid fa-hotel text-3xl mb-2"></i><p class="text-xs">尚未新增飯店</p></div>
+                        <div v-if="hotelList.length===0" class="py-8 flex flex-col items-center text-slate-300">
+                            <i class="fa-solid fa-hotel text-3xl mb-2"></i>
+                            <p class="text-xs">尚未新增飯店</p>
+                        </div>
                     </div>
                 </div>
-                <!-- 備份 -->
+
+                <!-- 行程備份 -->
                 <div class="bg-white p-5 rounded-3xl shadow-soft border border-slate-100">
                     <div class="flex items-center mb-3">
                         <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mr-3"><i class="fa-solid fa-floppy-disk"></i></div>
@@ -247,7 +331,10 @@
                     <p class="text-xs text-slate-400 mb-4 leading-relaxed">目前資料僅存在此裝置。匯出後傳給同行者，請他們匯入即可同步。</p>
                     <div class="flex gap-3">
                         <button @click="exportData" class="flex-1 bg-ice-500 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-file-export"></i> 匯出</button>
-                        <label class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"><i class="fa-solid fa-file-import"></i> 匯入<input type="file" @change="importData" class="hidden" accept=".json"></label>
+                        <label class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-file-import"></i> 匯入
+                            <input type="file" @change="importData" class="hidden" accept=".json">
+                        </label>
                     </div>
                 </div>
             </div>
@@ -269,24 +356,15 @@
                     </div>
                 </div>
             </div>
-
             <div class="px-4 mt-8" style="padding-bottom:calc(4rem + var(--safe-bottom))">
-                <!-- 標題 + 切換按鈕 -->
                 <div class="flex items-center justify-between mb-4 pt-2">
                     <h2 class="text-2xl font-bold text-slate-800 ml-1">購物清單</h2>
                     <div class="flex bg-slate-100 p-1 rounded-xl gap-1">
-                        <button @click="shoppingViewMode='grid'"
-                                :class="['px-3 py-1.5 rounded-lg text-xs font-bold transition-all',shoppingViewMode==='grid'?'bg-white shadow text-ice-500':'text-slate-400']">
-                            <i class="fa-solid fa-grip"></i>
-                        </button>
-                        <button @click="shoppingViewMode='list'"
-                                :class="['px-3 py-1.5 rounded-lg text-xs font-bold transition-all',shoppingViewMode==='list'?'bg-white shadow text-ice-500':'text-slate-400']">
-                            <i class="fa-solid fa-list"></i>
-                        </button>
+                        <button @click="shoppingViewMode='grid'" :class="['px-3 py-1.5 rounded-lg text-xs font-bold transition-all',shoppingViewMode==='grid'?'bg-white shadow text-ice-500':'text-slate-400']"><i class="fa-solid fa-grip"></i></button>
+                        <button @click="shoppingViewMode='list'" :class="['px-3 py-1.5 rounded-lg text-xs font-bold transition-all',shoppingViewMode==='list'?'bg-white shadow text-ice-500':'text-slate-400']"><i class="fa-solid fa-list"></i></button>
                     </div>
                 </div>
-
-                <!-- 格狀模式 -->
+                <!-- 格狀 -->
                 <div v-if="shoppingViewMode==='grid'" class="grid grid-cols-3 gap-3">
                     <div v-for="(item,idx) in shoppingList" :key="idx"
                          class="bg-white rounded-2xl shadow-soft border border-slate-100 relative group overflow-hidden cursor-pointer"
@@ -296,20 +374,17 @@
                             <div v-else class="w-full h-full flex items-center justify-center text-slate-300"><i class="fa-solid fa-image text-2xl"></i></div>
                         </div>
                         <p class="text-[10px] font-bold text-slate-700 truncate px-2 py-1.5">{{ item.name }}</p>
-                        <!-- 編輯/刪除浮層 -->
                         <div class="absolute inset-0 bg-black/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <button @click.stop="openShopModal(item,idx)" class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-ice-500 shadow"><i class="fa-solid fa-pen text-xs"></i></button>
                             <button @click.stop="removeShoppingItem(idx)" class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-red-500 shadow"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
-                    <!-- 新增按鈕 -->
                     <div @click="openShopModal()" class="border-2 border-dashed border-ice-200 rounded-2xl flex flex-col items-center justify-center aspect-square cursor-pointer text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-colors">
                         <i class="fa-solid fa-plus text-xl mb-1"></i>
                         <span class="text-[10px] font-bold">新增</span>
                     </div>
                 </div>
-
-                <!-- 條列模式 -->
+                <!-- 條列 -->
                 <div v-if="shoppingViewMode==='list'" class="space-y-2">
                     <div v-for="(item,idx) in shoppingList" :key="idx"
                          class="bg-white rounded-2xl shadow-soft border border-slate-100 flex items-center gap-3 p-3 cursor-pointer active:scale-95 transition-transform"
@@ -324,7 +399,6 @@
                             <button @click.stop="removeShoppingItem(idx)" class="w-8 h-8 rounded-full bg-slate-50 text-red-400 flex items-center justify-center hover:bg-red-50"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
-                    <!-- 新增按鈕 -->
                     <div @click="openShopModal()" class="border-2 border-dashed border-ice-200 rounded-2xl flex items-center justify-center gap-2 p-4 cursor-pointer text-ice-400 hover:bg-ice-50 hover:border-ice-400 transition-colors">
                         <i class="fa-solid fa-plus"></i>
                         <span class="text-sm font-bold">新增物品</span>
@@ -425,10 +499,9 @@
                                 <span v-if="exp.payment==='玉山Unicard'" class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">玉山</span>
                                 <span v-else-if="exp.payment==='中信LinePay'" class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded">中信</span>
                                 <span v-else class="text-[9px] bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded">{{ exp.payment }}</span>
-                                <!-- 分帳標示 -->
-                                <span v-if="exp.splitEnabled && exp.splitMode==='both'" class="text-[9px] bg-ice-50 text-ice-600 px-1.5 py-0.5 rounded border border-ice-100">分帳</span>
-                                <span v-else-if="exp.splitEnabled && exp.splitMode==='p1only'" class="text-[9px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded border border-purple-100">{{ splitSettings.person1 }}</span>
-                                <span v-else-if="exp.splitEnabled && exp.splitMode==='p2only'" class="text-[9px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded border border-orange-100">{{ splitSettings.person2 }}</span>
+                                <span v-if="exp.splitEnabled&&exp.splitMode==='both'" class="text-[9px] bg-ice-50 text-ice-600 px-1.5 py-0.5 rounded border border-ice-100">分帳</span>
+                                <span v-else-if="exp.splitEnabled&&exp.splitMode==='p1only'" class="text-[9px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded border border-purple-100">{{ splitSettings.person1 }}</span>
+                                <span v-else-if="exp.splitEnabled&&exp.splitMode==='p2only'" class="text-[9px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded border border-orange-100">{{ splitSettings.person2 }}</span>
                             </div>
                         </div>
                     </div>
@@ -441,7 +514,8 @@
                 <div v-if="expenses.length===0" class="text-center py-10 text-slate-400"><p class="text-sm">尚無消費紀錄</p></div>
             </div>
         </div>
-        <button @click="openExpenseModal()" style="bottom:calc(1.5rem + var(--safe-bottom))" class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
+        <button @click="openExpenseModal()" style="bottom:calc(1.5rem + var(--safe-bottom))"
+                class="absolute right-6 w-14 h-14 bg-accent-400 text-white rounded-full shadow-float flex items-center justify-center text-2xl hover:bg-accent-500 transition-all z-30">
             <i class="fa-solid fa-plus"></i>
         </button>
     </div>
@@ -526,9 +600,7 @@
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
-            <div class="p-4">
-                <h3 class="font-bold text-lg text-slate-800">{{ previewItem.name }}</h3>
-            </div>
+            <div class="p-4"><h3 class="font-bold text-lg text-slate-800">{{ previewItem.name }}</h3></div>
         </div>
     </div>
 
@@ -582,7 +654,6 @@
                         <button @click="expenseForm.ctbcRate='10'" :class="['flex-1 py-2 rounded-xl text-xs font-bold',expenseForm.ctbcRate==='10'?'bg-white text-slate-800':'bg-slate-700 text-slate-300']">特殊 10%</button>
                     </div>
                 </div>
-
                 <!-- 分帳 -->
                 <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                     <div class="flex items-center justify-between mb-3">
@@ -593,25 +664,17 @@
                         </button>
                     </div>
                     <div v-if="expenseForm.splitEnabled" class="space-y-3">
-                        <!-- 分帳模式選擇 -->
                         <div class="flex gap-2">
                             <button @click="expenseForm.splitMode='both'"
                                     :class="['flex-1 py-2 rounded-xl text-[10px] font-bold border transition-all',
-                                             expenseForm.splitMode==='both'?'bg-ice-500 text-white border-ice-500':'bg-white text-slate-500 border-slate-200']">
-                                兩人分攤
-                            </button>
+                                             expenseForm.splitMode==='both'?'bg-ice-500 text-white border-ice-500':'bg-white text-slate-500 border-slate-200']">兩人分攤</button>
                             <button @click="expenseForm.splitMode='p1only'"
                                     :class="['flex-1 py-2 rounded-xl text-[10px] font-bold border transition-all',
-                                             expenseForm.splitMode==='p1only'?'bg-purple-500 text-white border-purple-500':'bg-white text-slate-500 border-slate-200']">
-                                {{ splitSettings.person1 }}
-                            </button>
+                                             expenseForm.splitMode==='p1only'?'bg-purple-500 text-white border-purple-500':'bg-white text-slate-500 border-slate-200']">{{ splitSettings.person1 }}</button>
                             <button @click="expenseForm.splitMode='p2only'"
                                     :class="['flex-1 py-2 rounded-xl text-[10px] font-bold border transition-all',
-                                             expenseForm.splitMode==='p2only'?'bg-orange-400 text-white border-orange-400':'bg-white text-slate-500 border-slate-200']">
-                                {{ splitSettings.person2 }}
-                            </button>
+                                             expenseForm.splitMode==='p2only'?'bg-orange-400 text-white border-orange-400':'bg-white text-slate-500 border-slate-200']">{{ splitSettings.person2 }}</button>
                         </div>
-                        <!-- 兩人分攤才顯示比例 -->
                         <div v-if="expenseForm.splitMode==='both'" class="space-y-1">
                             <div class="flex justify-between">
                                 <span class="text-[10px] text-slate-500 font-bold">{{ splitSettings.person1 }}</span>
@@ -623,7 +686,6 @@
                                 <span class="text-xs font-black text-ice-600">{{ expenseForm.splitP2Pct }}%</span>
                             </div>
                         </div>
-                        <!-- 單人模式提示 -->
                         <div v-if="expenseForm.splitMode==='p1only'" class="bg-purple-50 rounded-xl p-3 text-center">
                             <p class="text-xs text-purple-600 font-bold">此筆費用由 {{ splitSettings.person1 }} 單獨負擔</p>
                         </div>
