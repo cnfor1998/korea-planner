@@ -6,6 +6,28 @@ createApp({
         const calcKrw = ref(null);
         const exchangeRate = ref(0.024);
 
+        // 匯率換算頁：選擇的回饋卡
+        const calcCardMode = ref('esun'); // 'esun' | 'ctbc_general' | 'ctbc_special' | 'custom'
+        const calcCustomRate = ref(3);    // 自訂%數
+
+        // 計算刷卡後金額（含1.5%手續費）
+        const calcCardAmount = computed(() => {
+            if (!calcKrw.value) return 0;
+            return Math.round(calcKrw.value * exchangeRate.value * 1.015);
+        });
+
+        // 計算回饋金額
+        const calcReward = computed(() => {
+            const amt = calcCardAmount.value;
+            if (!amt) return 0;
+            let rate = 0;
+            if (calcCardMode.value === 'esun') rate = 0.045;
+            else if (calcCardMode.value === 'ctbc_general') rate = 0.028;
+            else if (calcCardMode.value === 'ctbc_special') rate = 0.10;
+            else if (calcCardMode.value === 'custom') rate = (calcCustomRate.value || 0) / 100;
+            return Math.round(amt * rate);
+        });
+
         const STORAGE_KEYS = {
             ITINERARY: 'korea_trip_itinerary_v2',
             SHOPPING: 'korea_trip_shopping_v1',
@@ -128,9 +150,7 @@ createApp({
         const shoppingList = reactive([]);
         const expenses = reactive([]);
 
-        // 購物清單顯示模式：grid / list
         const shoppingViewMode = ref('grid');
-        // 購物清單預覽 modal
         const showShopPreview = ref(false);
         const previewItem = reactive({ name: '', image: null });
         const openShopPreview = (item) => {
@@ -139,7 +159,6 @@ createApp({
             showShopPreview.value = true;
         };
 
-        // 分帳設定
         const splitSettings = reactive(
             JSON.parse(localStorage.getItem(STORAGE_KEYS.SPLIT)) || { person1: '旅伴1', person2: '旅伴2' }
         );
@@ -198,10 +217,8 @@ createApp({
         const expenseForm = reactive({
             id: null, date: '2026-04-02', name: '', amount: '',
             category: '飲食', payment: '現金', currency: 'KRW', ctbcRate: '2.8',
-            splitEnabled: false,
-            splitMode: 'both',   // 'both' | 'p1only' | 'p2only'
-            splitP1: true, splitP2: true,
-            splitP1Pct: 50, splitP2Pct: 50
+            splitEnabled: false, splitMode: 'both',
+            splitP1: true, splitP2: true, splitP1Pct: 50, splitP2Pct: 50
         });
 
         watch(() => expenseForm.splitP1Pct, (v) => { expenseForm.splitP2Pct = 100 - v; });
@@ -210,8 +227,6 @@ createApp({
                 expenseForm.payment = '信用卡';
             }
         });
-
-        // splitMode 切換時同步 splitP1/P2
         watch(() => expenseForm.splitMode, (v) => {
             if (v === 'both') { expenseForm.splitP1 = true; expenseForm.splitP2 = true; }
             else if (v === 'p1only') { expenseForm.splitP1 = true; expenseForm.splitP2 = false; }
@@ -259,11 +274,8 @@ createApp({
                 if (mode === 'both') {
                     p1Total += amtTWD * ((item.splitP1Pct || 50) / 100);
                     p2Total += amtTWD * ((item.splitP2Pct || 50) / 100);
-                } else if (mode === 'p1only') {
-                    p1Total += amtTWD;
-                } else if (mode === 'p2only') {
-                    p2Total += amtTWD;
-                }
+                } else if (mode === 'p1only') { p1Total += amtTWD; }
+                else if (mode === 'p2only') { p2Total += amtTWD; }
             });
             p1Total = Math.round(p1Total); p2Total = Math.round(p2Total);
             const diff = Math.abs(p1Total - p2Total);
@@ -451,6 +463,7 @@ createApp({
             shoppingList, expenses, expensesStats, esunStats, ctbcStats,
             shoppingViewMode, showShopPreview, previewItem, openShopPreview,
             calcKrw, exchangeRate, weatherList,
+            calcCardMode, calcCustomRate, calcCardAmount, calcReward,
             getCategoryIcon, openMap,
             showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal,
             dragStart, drop,
