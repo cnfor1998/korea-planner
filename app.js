@@ -128,6 +128,17 @@ createApp({
         const shoppingList = reactive([]);
         const expenses = reactive([]);
 
+        // 購物清單顯示模式：grid / list
+        const shoppingViewMode = ref('grid');
+        // 購物清單預覽 modal
+        const showShopPreview = ref(false);
+        const previewItem = reactive({ name: '', image: null });
+        const openShopPreview = (item) => {
+            previewItem.name = item.name;
+            previewItem.image = item.image;
+            showShopPreview.value = true;
+        };
+
         // 分帳設定
         const splitSettings = reactive(
             JSON.parse(localStorage.getItem(STORAGE_KEYS.SPLIT)) || { person1: '旅伴1', person2: '旅伴2' }
@@ -183,10 +194,14 @@ createApp({
         const showShopModal = ref(false);
         const shopForm = reactive({ index: -1, name: '', image: null });
         const showExpenseModal = ref(false);
+
         const expenseForm = reactive({
             id: null, date: '2026-04-02', name: '', amount: '',
             category: '飲食', payment: '現金', currency: 'KRW', ctbcRate: '2.8',
-            splitEnabled: false, splitP1: true, splitP2: true, splitP1Pct: 50, splitP2Pct: 50
+            splitEnabled: false,
+            splitMode: 'both',   // 'both' | 'p1only' | 'p2only'
+            splitP1: true, splitP2: true,
+            splitP1Pct: 50, splitP2Pct: 50
         });
 
         watch(() => expenseForm.splitP1Pct, (v) => { expenseForm.splitP2Pct = 100 - v; });
@@ -194,6 +209,13 @@ createApp({
             if (newVal === 'TWD' && (expenseForm.payment === '玉山Unicard' || expenseForm.payment === '中信LinePay')) {
                 expenseForm.payment = '信用卡';
             }
+        });
+
+        // splitMode 切換時同步 splitP1/P2
+        watch(() => expenseForm.splitMode, (v) => {
+            if (v === 'both') { expenseForm.splitP1 = true; expenseForm.splitP2 = true; }
+            else if (v === 'p1only') { expenseForm.splitP1 = true; expenseForm.splitP2 = false; }
+            else if (v === 'p2only') { expenseForm.splitP1 = false; expenseForm.splitP2 = true; }
         });
 
         const currentItinerary = computed(() => itineraryData[selectedDate.value] || []);
@@ -233,11 +255,15 @@ createApp({
             expenses.forEach(item => {
                 if (!item.splitEnabled) return;
                 const amtTWD = item.currency === 'TWD' ? parseInt(item.amount || 0) : parseInt(item.amount || 0) * exchangeRate.value;
-                if (item.splitP1 && item.splitP2) {
+                const mode = item.splitMode || 'both';
+                if (mode === 'both') {
                     p1Total += amtTWD * ((item.splitP1Pct || 50) / 100);
                     p2Total += amtTWD * ((item.splitP2Pct || 50) / 100);
-                } else if (item.splitP1) { p1Total += amtTWD; }
-                else if (item.splitP2) { p2Total += amtTWD; }
+                } else if (mode === 'p1only') {
+                    p1Total += amtTWD;
+                } else if (mode === 'p2only') {
+                    p2Total += amtTWD;
+                }
             });
             p1Total = Math.round(p1Total); p2Total = Math.round(p2Total);
             const diff = Math.abs(p1Total - p2Total);
@@ -269,7 +295,9 @@ createApp({
             isEditing.value = true;
             Object.assign(form, {
                 ...item,
-                flight: item.flight ? { from: '', fromTerminal: '', dep: '', to: '', toTerminal: '', arr: '', no: '', ...item.flight } : { from: '', fromTerminal: '', dep: '', to: '', toTerminal: '', arr: '', no: '' }
+                flight: item.flight
+                    ? { from: '', fromTerminal: '', dep: '', to: '', toTerminal: '', arr: '', no: '', ...item.flight }
+                    : { from: '', fromTerminal: '', dep: '', to: '', toTerminal: '', arr: '', no: '' }
             });
             showModal.value = true;
         };
@@ -348,10 +376,12 @@ createApp({
 
         const openExpenseModal = (item = null) => {
             if (item) {
+                const mode = item.splitMode || (item.splitP1 && item.splitP2 ? 'both' : item.splitP1 ? 'p1only' : 'p2only');
                 Object.assign(expenseForm, {
                     ...item,
                     ctbcRate: item.ctbcRate || '2.8',
                     splitEnabled: item.splitEnabled || false,
+                    splitMode: mode,
                     splitP1: item.splitP1 !== undefined ? item.splitP1 : true,
                     splitP2: item.splitP2 !== undefined ? item.splitP2 : true,
                     splitP1Pct: item.splitP1Pct || 50,
@@ -361,7 +391,8 @@ createApp({
                 Object.assign(expenseForm, {
                     id: null, date: selectedDate.value, name: '', amount: '',
                     category: '飲食', payment: '現金', currency: 'KRW', ctbcRate: '2.8',
-                    splitEnabled: false, splitP1: true, splitP2: true, splitP1Pct: 50, splitP2Pct: 50
+                    splitEnabled: false, splitMode: 'both',
+                    splitP1: true, splitP2: true, splitP1Pct: 50, splitP2Pct: 50
                 });
             }
             showExpenseModal.value = true;
@@ -418,6 +449,7 @@ createApp({
             expandedItems, toggleExpand,
             splitSettings, splitStats, editingSplitNames,
             shoppingList, expenses, expensesStats, esunStats, ctbcStats,
+            shoppingViewMode, showShopPreview, previewItem, openShopPreview,
             calcKrw, exchangeRate, weatherList,
             getCategoryIcon, openMap,
             showModal, isEditing, form, openAddModal, editItem, saveItem, deleteItem, closeModal,
